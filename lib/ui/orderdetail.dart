@@ -24,10 +24,13 @@ class OrderDetail extends StatefulWidget {
 }
 
 class _OrderDetailState extends State<OrderDetail> {
+  final _formKey = GlobalKey<FormState>();
   final StreamController _streamController = StreamController();
   final StreamController _streamController2 = StreamController();
   TextEditingController _pay = TextEditingController();
   TextEditingController _textnote = TextEditingController();
+  TextEditingController _texttran = TextEditingController();
+  TextEditingController _cancelreson = TextEditingController();
 
   GlobalKey _containerKey = GlobalKey();
   String _selectpay = 'cash';
@@ -58,6 +61,7 @@ class _OrderDetailState extends State<OrderDetail> {
   num _status = 0;
   String _salename = '';
   String _salebrach = '';
+  num _tran = 0;
 
   final oCcy = NumberFormat("#,###.00", "th_TH");
   final oCcy2 = NumberFormat("#,###.##", "th_TH");
@@ -69,9 +73,98 @@ class _OrderDetailState extends State<OrderDetail> {
       _brach = prefs.getString('branch')!;
       _brachid = prefs.getString('branchid')!;
       _wh = prefs.getString('wh')!;
+
     });
   }
+  Future AddTransport(){
 
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(builder: (context,setState){
+            return AlertDialog(
+
+                content: SizedBox(
+                  height: MediaQuery.of(context).size.height*.3,
+                  width: MediaQuery.of(context).size.width*.5,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(child: Container(
+                        alignment: Alignment.center,
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Icon(LineIcons.truckMoving,size: 24,color: Theme.of(context).primaryColor,),
+                                Text(' Shipping Rate',style: textBodyMedium.copyWith(fontSize: 18,color: Colors.black),),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Row(
+                              children: [
+                                Expanded(child: TextFormField(
+                                  decoration: inputForm1(''),
+
+                                  controller: _texttran,
+                                ))
+                              ],
+                            )
+                          ],
+                        ),
+                      )),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.redAccent
+                              ),
+                              onPressed: (){
+                                Navigator.of(context).pop();
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text('Cancel',style: textBodyLage.copyWith(fontSize: 18)),
+                              )),
+                          ElevatedButton(
+                              onPressed: () async {
+
+                                await ApiSerivces().PosAddTran(_id, _texttran.text).then((e) {
+
+                                  Navigator.of(context).pop();
+                                  setState(() {
+
+                                    LoadInvicesub(widget.genorder);
+
+                                    _tran = num.parse(_texttran.text);
+
+                                  });
+
+                                });
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: Text('Add',style: textBodyLage.copyWith(fontSize: 18),),
+                              )),
+
+
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+
+            );
+          });
+        }
+    );
+  }
   LoadInvicesub(gencode) async {
     ApiSerivces().companyinfo().then((res) {
       print(res.data[0]);
@@ -98,6 +191,8 @@ class _OrderDetailState extends State<OrderDetail> {
         _vatamount = res.data[0]['vatamount'];
         _docid = res.data[0]['docno'];
         _dicount = res.data[0]['discounttext'];
+        _tran = res.data[0]['shippingamount'];
+
         _docdate =
             DateFormat('dd/MM/yyyy  H:mm ').format(DateTime.now()).toString();
 
@@ -125,6 +220,7 @@ class _OrderDetailState extends State<OrderDetail> {
     super.initState();
     GetLogin();
     LoadInvicesub(widget.genorder);
+
   }
 
   @override
@@ -161,9 +257,15 @@ class _OrderDetailState extends State<OrderDetail> {
                 if (Orientation.portrait  == currentOrientation) {
                   print(orientation);
 
+
                   return P();
                 } else {
-                  return L();
+                  if(MediaQuery.of(context).size.width > 800 ){
+                    return L();
+                  } else {
+                    return P();
+                  }
+
                 }
               },
             )
@@ -175,8 +277,8 @@ class _OrderDetailState extends State<OrderDetail> {
         context: context,
         builder: (BuildContext context) => AlertDialog(
                 content: SizedBox(
-              height: MediaQuery.of(context).size.height * .3,
-              width: MediaQuery.of(context).size.width * .3,
+              height: MediaQuery.of(context).size.height * .4,
+              width: MediaQuery.of(context).size.width * .4,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -198,6 +300,41 @@ class _OrderDetailState extends State<OrderDetail> {
                           style: textBodyMedium.copyWith(
                               fontSize: 13, color: Colors.black),
                         ),
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Form(
+                            key: _formKey,
+                            child: TextFormField(
+                              controller: _cancelreson,
+                              decoration: InputDecoration(
+
+                                enabledBorder:  OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(6.0),
+                                  borderSide:  BorderSide(color: HexColor('3ea3d4'), width: 1.0),
+                                ),
+                                labelStyle: textBody.copyWith(fontSize: 14,color: HexColor('3ea3d4')),
+                                border:
+                                OutlineInputBorder(borderRadius: BorderRadius.circular(6.0)),
+                                contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+                                focusedBorder:  OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(Radius.circular(6.0)),
+                                  borderSide: BorderSide(width: 1, color: HexColor('3ea3d4'),),
+                                ),
+                                labelText: 'Cancellation Reason',
+
+
+                              ),
+                              validator: (e){
+                                if(e?.length == 0){
+                                  return 'Text Not Empty';
+                                }
+                              },
+                              maxLines: 3,
+                            ),
+                          ),
+                        )
+                        
+
                       ],
                     ),
                   )),
@@ -218,8 +355,9 @@ class _OrderDetailState extends State<OrderDetail> {
                           )),
                       ElevatedButton(
                           onPressed: () async {
+                            if(_formKey.currentState?.validate() == true)
                             await ApiSerivces()
-                                .CanelOrer(widget.genorder)
+                                .CanelOrer(widget.genorder,_cancelreson.text)
                                 .then((e) {
                               Navigator.pushReplacement(
                                   context,
@@ -260,7 +398,7 @@ class _OrderDetailState extends State<OrderDetail> {
                       color: Theme.of(context).primaryColor,
                     ),
                     padding: const EdgeInsets.only(top: 4),
-                    height: MediaQuery.of(context).size.height * .4,
+                    height:  MediaQuery.of(context).size.width> 400?MediaQuery.of(context).size.height * .9:MediaQuery.of(context).size.height * .5,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -412,119 +550,120 @@ class _OrderDetailState extends State<OrderDetail> {
                                 ))
                           ],
                         ),
-                        divb(),
+                        divb(context),
                         const SizedBox(
                           height: 10,
                         ),
-                        Expanded(
-                          flex: 1,
+                        Flexible(
+
                           child: ShoworderDetail(widget.genorder),
                         ),
-                        divb(),
-                        Expanded(
-                            flex: 1,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  right: 20.0, left: 20),
-                              child: Column(
+                        divb(context),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              right: 20.0, left: 20,bottom: 20),
+                          child: Column(
+                            children: [
+                              Row(
                                 children: [
-                                  Row(
-                                    children: [
-                                      Text('Subtotal',
-                                          style: textLanadscapL
-                                              .copyWith(fontSize: 12)),
-                                      Expanded(
-                                        child: Row(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                                "${oCcy.format(_beforvat)}",
-                                                style: textLanadscapL
-                                                    .copyWith(
-                                                    fontSize: 12))
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text('Tax',
-                                          style: textLanadscapL),
-                                      Expanded(
-                                        child: Row(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                                oCcy.format(_vatamount),
-                                                style: textLanadscapL
-                                                    .copyWith(
-                                                    fontSize: 12))
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text('Discount',
-                                          style: textLanadscapL
-                                              .copyWith(fontSize: 12)),
-                                      Expanded(
-                                        child: Row(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.end,
-                                          children: [
-                                            Text(oCcy.format(_dicount),
-                                                style: textLanadscapL
-                                                    .copyWith(
-                                                    fontSize: 12))
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  Row(
-                                    children: [
-                                      Text('Total',
-                                          style: textLanadscapL
-                                              .copyWith(fontSize: 12)),
-                                      Expanded(
-                                        child: Row(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                          MainAxisAlignment.end,
-                                          children: [
-                                            Text(oCcy.format(_amonut),
-                                                style: textLanadscapL
-                                                    .copyWith(
-                                                    fontSize: 12))
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
+                                  Text('Subtotal',
+                                      style: textLanadscapL
+                                          .copyWith(fontSize: 12)),
+                                  Expanded(
+                                    child: Row(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                            "${oCcy.format(_befordiscount)}",
+                                            style: textLanadscapL
+                                                .copyWith(
+                                                fontSize: 12))
+                                      ],
+                                    ),
+                                  )
                                 ],
                               ),
-                            )),
+
+
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              _tran>0?Row(
+                                children: [
+                                  Text('Shipping Rate',
+                                      style: textLanadscapL
+                                          .copyWith(fontSize: 12)),
+                                  Expanded(
+                                    child: Row(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.end,
+                                      children: [
+                                        Text(oCcy.format(_tran),
+                                            style: textLanadscapL
+                                                .copyWith(
+                                                fontSize: 12))
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ):Row(),
+                              _tran>0?SizedBox(
+                                height: 5,
+                              ):Row(),
+                              Row(
+                                children: [
+                                  Text('Discount',
+                                      style: textLanadscapL
+                                          .copyWith(fontSize: 12)),
+                                  Expanded(
+                                    child: Row(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.end,
+                                      children: [
+                                        Text(oCcy.format(_dicount),
+                                            style: textLanadscapL
+                                                .copyWith(
+                                                fontSize: 12))
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+
+                              Row(
+                                children: [
+                                  Text('Total',
+                                      style: textLanadscapL
+                                          .copyWith(fontSize: 12)),
+                                  Expanded(
+                                    child: Row(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.end,
+                                      children: [
+                                        Text(oCcy.format(_amonut),
+                                            style: textLanadscapL
+                                                .copyWith(
+                                                fontSize: 12))
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   )
@@ -569,6 +708,7 @@ class _OrderDetailState extends State<OrderDetail> {
                   const SizedBox(
                     height: 10,
                   ),
+
                   ElevatedButton(
                       onPressed: () async {
                         await ApiSerivces()
@@ -662,6 +802,26 @@ class _OrderDetailState extends State<OrderDetail> {
                           ],
                         ),
                       )),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  ElevatedButton(
+                    onPressed: (){
+                      AddTransport();
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        children: [
+                          Icon(LineIcons.truckMoving,color: Colors.white,),
+                          Text(' Shipping Rate',style: textBodyLage.copyWith(fontSize: 19),)
+                        ],
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.brown
+                    ),
+                  ),
                   const SizedBox(
                     height: 10,
                   ),
@@ -904,7 +1064,7 @@ class _OrderDetailState extends State<OrderDetail> {
                                 ))
                           ],
                         ),
-                        divb(),
+                        divb(context),
                         const SizedBox(
                           height: 10,
                         ),
@@ -912,7 +1072,7 @@ class _OrderDetailState extends State<OrderDetail> {
                           flex: 2,
                           child: ShoworderDetail(widget.genorder),
                         ),
-                        divb(),
+                        divb(context),
                         Expanded(
                             flex: 1,
                             child: Padding(
@@ -933,7 +1093,7 @@ class _OrderDetailState extends State<OrderDetail> {
                                           MainAxisAlignment.end,
                                           children: [
                                             Text(
-                                                "${oCcy.format(_beforvat)}",
+                                                "${oCcy.format(_befordiscount)}",
                                                 style: textLanadscapL
                                                     .copyWith(
                                                     fontSize: 15))
@@ -945,10 +1105,11 @@ class _OrderDetailState extends State<OrderDetail> {
                                   const SizedBox(
                                     height: 5,
                                   ),
-                                  Row(
+                                  _tran>0?Row(
                                     children: [
-                                      Text('Tax',
-                                          style: textLanadscapL),
+                                      Text('Shipping Rate',
+                                          style: textLanadscapL
+                                              .copyWith(fontSize: 12)),
                                       Expanded(
                                         child: Row(
                                           crossAxisAlignment:
@@ -956,19 +1117,18 @@ class _OrderDetailState extends State<OrderDetail> {
                                           mainAxisAlignment:
                                           MainAxisAlignment.end,
                                           children: [
-                                            Text(
-                                                oCcy.format(_vatamount),
+                                            Text(oCcy.format(_tran),
                                                 style: textLanadscapL
                                                     .copyWith(
-                                                    fontSize: 15))
+                                                    fontSize: 12))
                                           ],
                                         ),
                                       )
                                     ],
-                                  ),
-                                  const SizedBox(
+                                  ):Row(),
+                                  _tran>0?SizedBox(
                                     height: 5,
-                                  ),
+                                  ):Row(),
                                   Row(
                                     children: [
                                       Text('Discount',
@@ -1224,6 +1384,27 @@ class _OrderDetailState extends State<OrderDetail> {
                           ],
                         ),
                       )),
+                  const SizedBox(
+                    height: 10,
+                  ),
+
+                  ElevatedButton(
+                    onPressed: (){
+                      AddTransport();
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        children: [
+                          Icon(LineIcons.truckMoving,color: Colors.white,),
+                          Text(' Shipping Rate',style: textBodyLage.copyWith(fontSize: 19),)
+                        ],
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.brown
+                    ),
+                  ),
                   const SizedBox(
                     height: 10,
                   ),

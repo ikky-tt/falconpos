@@ -1,11 +1,17 @@
 import 'package:falconpos/api/constant.dart';
 import 'package:falconpos/function/function.dart';
 import 'package:falconpos/theme/textshow.dart';
+import 'package:falconpos/ui/mainpos.dart';
+import 'package:falconpos/ui/recoveruser.dart';
+import 'package:falconpos/widget/privcy.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'dart:io' show Platform;
 import '../api/apiservice.dart';
 import '../model/modeluser.dart';
+import 'dashboard.dart';
 import 'mainpage.dart';
 
 class LoginPage extends StatefulWidget {
@@ -18,7 +24,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _key = GlobalKey();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-
+  bool _chk = false;
   final _email = TextEditingController();
   final _password = TextEditingController();
   bool _obscureText = true;
@@ -96,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
       child: Container(
         decoration:  BoxDecoration(
           borderRadius: BorderRadius.all(Radius.circular(28)),
-          color: Theme.of(context).primaryColor,
+          color: Theme.of(context).colorScheme.primaryContainer,
         ),
         width: MediaQuery.of(context).size.width*.9,
         height: MediaQuery.of(context).size.height*.8,
@@ -124,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text('${version}',style: textBodyMedium.copyWith(fontWeight: FontWeight.w800,),),
+                        child: Text('${version}',style:Theme.of(context).textTheme.labelMedium,),
                       )
                     ],
                   ),
@@ -141,17 +147,12 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      Expanded(
-                          child: Row(
-                            children: [
-                              Text('Login Ponit of Sale',style: textBodyLage.copyWith(color: Colors.white,fontSize: 20),),
-                            ],
-                          )),
+
                       Row(
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10),
-                            child: Text('Username',style: textBodyLage.copyWith(color: Colors.white,fontSize: 18),),
+                            child: Text('Username',style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 18),),
                           ),
                         ],
                       ),
@@ -159,15 +160,16 @@ class _LoginPageState extends State<LoginPage> {
                       TextFormField(
                         keyboardType: TextInputType.text,
                         autofocus: false,
+                        style: Theme.of(context).textTheme.bodyMedium,
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.fromLTRB(15.0, 3.0, 3.0, 10.0),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide(color: Colors.white),
+                            borderSide: BorderSide(color: Theme.of(context).colorScheme.onPrimaryContainer),
                           ),
-                          focusedBorder:  const OutlineInputBorder(
+                          focusedBorder:   OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                            borderSide: BorderSide(width: 1, color: Colors.white),
+                            borderSide: BorderSide(width: 1, color: Theme.of(context).colorScheme.onPrimaryContainer),
                           ),
                         ),
                         validator: (value) {
@@ -184,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10),
-                            child: Text('Password',style: textBodyLage.copyWith(color: Colors.white,fontSize: 18),),
+                            child: Text('Password',style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 18),),
                           ),
                         ],
                       ),
@@ -197,11 +199,11 @@ class _LoginPageState extends State<LoginPage> {
                             contentPadding: const EdgeInsets.fromLTRB(15.0, 3.0, 3.0, 10.0),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
-                              borderSide: BorderSide(color: Colors.white),
+                              borderSide: BorderSide(color: Theme.of(context).colorScheme.onPrimaryContainer),
                             ),
-                            focusedBorder:  const OutlineInputBorder(
+                            focusedBorder:   OutlineInputBorder(
                               borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                              borderSide: BorderSide(width: 1, color: Colors.white),
+                              borderSide: BorderSide(width: 1, color: Theme.of(context).colorScheme.onPrimaryContainer),
                             ),
                             suffixIcon: GestureDetector(
                               onTap: () {
@@ -236,7 +238,7 @@ class _LoginPageState extends State<LoginPage> {
                             Expanded(
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white,
+                                    backgroundColor: Theme.of(context).colorScheme.background,
                                     elevation: 0
                                 ),
 
@@ -253,6 +255,40 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       const SizedBox(height: 15.0),
+                      kIsWeb?Row():Platform.isIOS?Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  InkWell(
+                                    onTap: (){
+
+                                      _showMyDialog();
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Text('Register',style: textBodyLage.copyWith(fontSize: 14,color: Colors.white),),
+                                    ),
+                                  ),
+                                  Text('|',style: textBodyLage.copyWith(fontSize: 14,color: Colors.white)),
+                                  InkWell(
+                                    onTap: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>RecoveryPassword())),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Text('Recover Password',style: textBodyLage.copyWith(fontSize: 14,color: Colors.white),),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ):Row(),
+                      kIsWeb?Row():Platform.isIOS?SizedBox(height: 10.0):Row(),
                     ],
                   ),
 
@@ -260,27 +296,26 @@ class _LoginPageState extends State<LoginPage> {
                 ))
           ],
         ),
-
-
-
-
       ),
     );
   }
   Widget landscapeMode() {
+    final sw = MediaQuery.of(context).size;
     return  Card(
       elevation: 10,
+      color: Theme.of(context).colorScheme.primary,
 
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(30),
       ),
       child: Container(
 
-        width: MediaQuery.of(context).size.width*.5,
-        height: MediaQuery.of(context).size.height*.6,
+        width:  sw.width<900?sw.width*.9:sw.width*.5,
+        height: sw.width<900?sw.height*.9:sw.height*.6,
         child: Row(
           children: [
             Expanded(
+
                 child: Container(
                   alignment: Alignment.center,
                   decoration: const BoxDecoration(
@@ -295,7 +330,8 @@ class _LoginPageState extends State<LoginPage> {
                         padding: const EdgeInsets.all(20.0),
                         child: Image.asset(
                           'assets/images/logow.png',
-                          height: MediaQuery.of(context).size.height*.1,
+                          fit: BoxFit.fitWidth,
+
 
                         ),
                       ),),
@@ -309,44 +345,40 @@ class _LoginPageState extends State<LoginPage> {
             )
             ),
             Expanded(
-                child: Container(
+                flex: sw.width<900?2:1,
+                child:Container(
+
                   alignment: Alignment.center,
                   padding: EdgeInsets.all(20),
-                  decoration:  BoxDecoration(
-                    borderRadius: const BorderRadius.only(topRight: Radius.circular(28),bottomRight: Radius.circular(28) ),
-                    color: Theme.of(context).primaryColor,
-                  ),
+
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      Expanded(
-                          child: Row(
-                            children: [
-                              Text('Login Ponit of Sale',style: textBodyLage.copyWith(color: Colors.white,fontSize: 18),),
-                            ],
-                          )),
+
                       Row(
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10),
-                            child: Text('Username',style: textBodyLage.copyWith(color: Colors.white,fontSize: 18),),
+                            child: Text('Username',style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 18,color: Theme.of(context).colorScheme.background),),
                           ),
                         ],
                       ),
 
                       TextFormField(
                         keyboardType: TextInputType.text,
+                        cursorColor: Theme.of(context).colorScheme.background,
                         autofocus: false,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 18,color: Theme.of(context).colorScheme.background),
                         decoration: InputDecoration(
                           contentPadding: const EdgeInsets.fromLTRB(15.0, 3.0, 3.0, 10.0),
                           enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                               borderSide: BorderSide(color: Colors.white),
+                            borderRadius: BorderRadius.circular(10.0),
+                            borderSide: BorderSide(color: Theme.of(context).colorScheme.background),
                           ),
-                          focusedBorder:  const OutlineInputBorder(
+                          focusedBorder:   OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                            borderSide: BorderSide(width: 1, color: Colors.white),
+                            borderSide: BorderSide(width: 1, color: Theme.of(context).colorScheme.background),
                           ),
                         ),
                         validator: (value) {
@@ -363,7 +395,7 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10),
-                            child: Text('Password',style: textBodyLage.copyWith(color: Colors.white,fontSize: 18),),
+                            child: Text('Password',style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 18,color: Theme.of(context).colorScheme.background),),
                           ),
                         ],
                       ),
@@ -371,16 +403,18 @@ class _LoginPageState extends State<LoginPage> {
                           autofocus: false,
                           obscureText: _obscureText,
                           keyboardType: TextInputType.text,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 18,color: Theme.of(context).colorScheme.background),
+                          cursorColor: Theme.of(context).colorScheme.background,
                           decoration: InputDecoration(
                             hintText: '',
                             contentPadding: const EdgeInsets.fromLTRB(15.0, 3.0, 3.0, 10.0),
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10.0),
-                              borderSide: BorderSide(color: Colors.white),
+                              borderSide: BorderSide(color: Theme.of(context).colorScheme.background),
                             ),
-                            focusedBorder:  const OutlineInputBorder(
+                            focusedBorder:   OutlineInputBorder(
                               borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                              borderSide: BorderSide(width: 1, color: Colors.white),
+                              borderSide: BorderSide(width: 1, color: Theme.of(context).colorScheme.background),
                             ),
                             suffixIcon: GestureDetector(
                               onTap: () {
@@ -390,7 +424,7 @@ class _LoginPageState extends State<LoginPage> {
                               },
                               child: Icon(
                                 _obscureText ? Icons.visibility : Icons.visibility_off,
-                                color: getPrefixIconColor(),
+                                color: Theme.of(context).colorScheme.background,
                                 semanticLabel:
                                 _obscureText ? 'show password' : 'hide password',
                               ),
@@ -415,8 +449,8 @@ class _LoginPageState extends State<LoginPage> {
                             Expanded(
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  elevation: 0
+                                    backgroundColor: Theme.of(context).colorScheme.background,
+                                    elevation: 0
                                 ),
 
                                 onPressed: _sendToServer,
@@ -431,12 +465,46 @@ class _LoginPageState extends State<LoginPage> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 15.0),
+                      kIsWeb?Row():Platform.isIOS?Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  InkWell(
+                                    onTap: (){
 
+                                      _showMyDialog();
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Text('Register',style: textBodyLage.copyWith(fontSize: 14,color: Colors.white),),
+                                    ),
+                                  ),
+                                  Text('|',style: textBodyLage.copyWith(fontSize: 14,color: Colors.white)),
+                                  InkWell(
+                                    onTap: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>RecoveryPassword())),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Text('Recover Password',style: textBodyLage.copyWith(fontSize: 14,color: Colors.white),),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ):Row(),
+                      kIsWeb?Row():Platform.isIOS?SizedBox(height: 10.0):Row(),
                     ],
                   ),
 
 
-            ))
+                ))
           ],
         ),
 
@@ -472,7 +540,26 @@ class _LoginPageState extends State<LoginPage> {
           await prefs.setString('branch', user.branch);
           await prefs.setInt('branchid', user.branchid);
           await prefs.setInt("login", 1);
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> MainPage()));
+
+          if(kIsWeb){
+
+            if(user.empLv == 1) {
+
+              context.go('/pos');
+            } else {
+              context.go('/pos');
+
+            }
+
+          } else {
+            if(user.empLv == 1) {
+              Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (context) => MainPOS()));
+            } else {
+              Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (context) => MainPOS()));
+            }
+          }
 
         } else {
 
@@ -502,6 +589,17 @@ class _LoginPageState extends State<LoginPage> {
     }
 // validation error
   }
+  Future<void> _showMyDialog() async {
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return Privacy();
+      },
+    );
+  }
+
 
 // Creates an alertDialog for the user to enter their email
 }

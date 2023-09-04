@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'dash.dart';
 
-Widget divb() {
+Widget divb(context) {
 
   return  Row(
     mainAxisAlignment: MainAxisAlignment.start,
@@ -12,8 +12,8 @@ Widget divb() {
       Container(
         height:20,
         width: 10,
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration:  BoxDecoration(
+          color: Theme.of(context).colorScheme.background,
           borderRadius: BorderRadius.only(
             topRight: Radius.circular(50),
             bottomRight: Radius.circular(50),
@@ -23,13 +23,13 @@ Widget divb() {
       Expanded(
         child:  Container(
           alignment: Alignment.center,
-          child: const MySeparator(color: Colors.white),
+          child:  MySeparator(color: Theme.of(context).colorScheme.background,),
         ),),
       Container(
         height:20,
         width: 10,
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration:  BoxDecoration(
+          color: Theme.of(context).colorScheme.background,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(50),
             bottomLeft: Radius.circular(50),

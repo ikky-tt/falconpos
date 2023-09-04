@@ -4,13 +4,16 @@ import 'package:app_version_update/app_version_update.dart';
 import 'package:falconpos/theme/textshow.dart';
 
 import 'package:falconpos/ui/POSPortraitmode.dart';
+import 'package:falconpos/ui/dashboard.dart';
 import 'package:falconpos/ui/login.dart';
+import 'package:falconpos/ui/mainpos.dart';
 
 import 'package:falconpos/ui/poslandscapemode.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,10 +21,10 @@ import 'package:find_dropdown/find_dropdown.dart';
 import '../api/apiservice.dart';
 
 class MainPage extends StatefulWidget {
-  var custid;
-  var custname;
-  var custcode;
-  var genorder;
+  final custid;
+  final custname;
+  final custcode;
+  final genorder;
 
   MainPage({Key? key, this.custid, this.custname, this.custcode ,this.genorder})
       : super(key: key);
@@ -70,19 +73,48 @@ class _MainPageState extends State<MainPage> {
   }
 
   int? _login = 0;
+  int _lv = 0;
 
   GetLogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _empname = prefs.getString('name')!;
-      _brach = prefs.getString('branch')!;
-      _brachid = prefs.getInt('branchid')!;
-      _wh = prefs.getString('wh')!;
+      _empname = prefs.getString('name')??'';
+      _brach = prefs.getString('branch')??'';
+      _brachid = prefs.getInt('branchid')??0;
+      _wh = prefs.getString('wh')??'';
+      _login = prefs.getInt('login')??0;
+      _lv = prefs.getInt("lv")??0;
       print(_brachid);
+      print(_login);
+      if ( _login != 1 ) {
+        print("logingo");
 
-      if (prefs.getInt('login') != 1) {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => LoginPage()));
+        if(kIsWeb){ print("logingo22");
+
+          GoRouter.of(context).go('/login');
+        } else {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => LoginPage()));
+        }
+
+      }
+      print(_lv);
+      if(_lv == 1){
+
+        if(kIsWeb){
+          print('+v');
+          context.go('/pos');
+        } else {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => MainPOS()));
+        }
+      } else {
+        if(kIsWeb){
+          (context).go('/login');
+        } else {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => MainPOS()));
+        }
       }
     });
   }
@@ -98,107 +130,24 @@ class _MainPageState extends State<MainPage> {
 
   @override
   initState() {
-    GetLogin();
+
 
     // TODO: implement initState
     super.initState();
-    DocNo();
 
-    _nodfocus = FocusNode();
-
-    if (widget.genorder == null) {
-      genorder = new DateTime.now().millisecondsSinceEpoch.toString();
-    } else {
-      genorder = widget.genorder;
+    GetLogin();
 
 
-    }
-    print("widget.custid" + widget.custid.toString() );
-    print(widget.custid);
-    if(kIsWeb == false) {
-      _verifyVersion();
-    }
 
   }
-  void _verifyVersion() async {
-    await AppVersionUpdate.checkForUpdates(
-        appleId: '6446825944', playStoreId: 'com.falconcirrus.falconpos', country: 'th')
-        .then((data) async {
-      print(data.canUpdate);
-
-        // await AppVersionUpdate.showBottomSheetUpdate(context: context, appVersionResult: appVersionResult)
-        // await AppVersionUpdate.showPageUpdate(context: context, appVersionResult: appVersionResult)
-      if(data.canUpdate!){
-        await AppVersionUpdate.showAlertUpdate(
-          appVersionResult: data,
-          context: context,
-          backgroundColor: Colors.grey[200],
-          title: 'New Version.',
-          content:
-          'New version avaible? ${data.storeVersion}',
-          updateButtonText: 'UPDATE',
-          updateButtonStyle: ButtonStyle(
-            shape: MaterialStatePropertyAll<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-
-            textStyle: MaterialStatePropertyAll<TextStyle>(textBodyMedium),
-            backgroundColor:  MaterialStatePropertyAll<Color>(Theme.of(context).primaryColor),
-          ),
-          cancelButtonStyle:  ButtonStyle(
-            shape: MaterialStatePropertyAll<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-
-            textStyle: MaterialStatePropertyAll<TextStyle>(textBodyMedium),
-            backgroundColor:  MaterialStatePropertyAll<Color>(Colors.grey),
-          ),
-          cancelButtonText: 'CANCEL',
-          titleTextStyle: textBodyMedium.copyWith( color: Colors.black, fontWeight: FontWeight.w600, fontSize: 18.0),
-          contentTextStyle: textBodyMedium.copyWith( color: Colors.black, fontWeight: FontWeight.w400, fontSize: 16.0),
-
-        );
-      }
-        });
-    // TODO: implement initState
-  }
-
 
   @override
   Widget build(BuildContext context) {
     Orientation currentOrientation = MediaQuery
         .of(context)
         .orientation;
-    return  OrientationBuilder(
-      builder: (context, orientation) {
-        if (Orientation.portrait  == currentOrientation) {
-          print(orientation);
-
-          return POSPortraitMode(
-            genorder: genorder,
-            custcode: widget.custcode,
-            custid: widget.custid,
-            custname: widget.custname,
-          );
-        } else {
-
-          if(MediaQuery.of(context).size.width>1000){
-
-            return POSLandscape(
-              genorder: genorder,
-              custcode: widget.custcode,
-              custid: widget.custid,
-              custname: widget.custname,
-            );
-          } else {
-            return POSPortraitMode(
-              genorder: genorder,
-              custcode: widget.custcode,
-              custid: widget.custid,
-              custname: widget.custname,
-            );
-
-          }
-
-
-        }
-      },
+    return  Center(
+      child: Image.asset('assets/images/logow.png'),
     );
 
   }

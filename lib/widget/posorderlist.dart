@@ -42,7 +42,7 @@ class _PossuplistState extends State<Possuplist> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        divb(),
+        divb(context),
         const SizedBox(
           height: 10,
         ),
@@ -203,7 +203,7 @@ class _PossuplistState extends State<Possuplist> {
             },
           ),
         ),
-        divb(),
+        divb(context),
         const SizedBox(
           height: 10,
         ),

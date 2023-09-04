@@ -74,7 +74,11 @@ class _BarcodeScanState extends State<BarcodeScan> {
                       ee.data[0]['sellprice'],
                       ee.data[0]
                       ['discount'] ?? 0,
-                      widget.wh)
+                      widget.wh,
+                    ee.data[0]['promotionname'],
+                    ee.data[0]['promotionid'],
+                    widget.brachid
+                  )
                       .then((v) {
                     widget.barCodecontroller.text = '';
                     print('ssd');
@@ -135,7 +139,11 @@ class _BarcodeScanState extends State<BarcodeScan> {
                         ee.data[0]['sellprice'],
                         ee.data[0]
                         ['discount'] ?? 0,
-                        widget.wh)
+                        widget.wh,
+                      ee.data[0]['promotionname'],
+                      ee.data[0]['promotionid'],
+                      widget.brachid
+                    )
                         .then((v) async {
 
                       print('ssd');

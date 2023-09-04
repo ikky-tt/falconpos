@@ -207,7 +207,7 @@ class _ListOrderState extends State<ListOrder> {
                     ),
                     Text(' ${mounth} ',
                         style: textLanadscapL.copyWith(
-                            fontSize: 24, color: Colors.black)),
+                            fontSize: 24, color: Theme.of(context).colorScheme.onBackground)),
                     InkWell(
                       child: Icon(Icons.arrow_forward_ios),
                       onTap: () {
@@ -236,7 +236,7 @@ class _ListOrderState extends State<ListOrder> {
               Expanded(
                   child: Text(
                 '${_range}',
-                style: textLanadscapL.copyWith(fontSize: 24, color: Colors.black),
+                style: textLanadscapL.copyWith(fontSize: 24, color: Theme.of(context).colorScheme.onBackground),
               )),
               _lv ==1? SizedBox(
                 width: 150,
@@ -245,7 +245,7 @@ class _ListOrderState extends State<ListOrder> {
                   popupProps: PopupPropsMultiSelection.modalBottomSheet(
                     title: Padding(
                       padding: const EdgeInsets.only(top: 30.0),
-                      child: Text('',style: textBodyLage.copyWith(color: Colors.black),),
+                      child: Text('',style: textBodyLage.copyWith(color: Theme.of(context).colorScheme.onBackground),),
                     ),
                     showSelectedItems: true,
                     showSearchBox:false,
@@ -262,7 +262,7 @@ class _ListOrderState extends State<ListOrder> {
                         ),
                         child: ListTile(
                           selected: isSelected,
-                          title: Text(item.name,style: textBodyLage.copyWith(color: Colors.black,fontSize: 14),),
+                          title: Text(item.name,style: textBodyLage.copyWith(color: Theme.of(context).colorScheme.onBackground,fontSize: 14),),
                         ),
                       );
                     },
@@ -455,13 +455,13 @@ class _ListOrderState extends State<ListOrder> {
                                                 ' ${oCcy.format(snapshot.data[i]['amount'])}',
                                                 style: textBodyLage.copyWith(
                                                     fontSize: 18,
-                                                    color: Colors.black),
+                                                    color: Theme.of(context).colorScheme.onBackground),
                                               )
                                             : Text(
                                                 '0',
                                                 style: textBodyLage.copyWith(
                                                     fontSize: 18,
-                                                    color: Colors.black),
+                                                    color: Theme.of(context).colorScheme.onBackground),
                                               ),
                                         SizedBox(
                                           width: 20,
@@ -492,7 +492,7 @@ class _ListOrderState extends State<ListOrder> {
                                                         textBodyLage.copyWith(
                                                             fontSize: 18,
                                                             color:
-                                                                Colors.black),
+                                                                Theme.of(context).colorScheme.onBackground),
                                                   ),
                                                 ),
                                               )
@@ -588,7 +588,7 @@ class _ListOrderState extends State<ListOrder> {
                   ),
                   Text(' ${mounth} ',
                       style: textLanadscapL.copyWith(
-                          fontSize: 14, color: Colors.black)),
+                          fontSize: 14, color: Theme.of(context).colorScheme.onBackground)),
                   InkWell(
                     child: Icon(Icons.arrow_forward_ios),
                     onTap: () {
@@ -669,7 +669,7 @@ class _ListOrderState extends State<ListOrder> {
           children: [
             Text(
               '${_range}',
-              style: textLanadscapL.copyWith(fontSize: 16, color: Colors.black),
+              style: textLanadscapL.copyWith(fontSize: 16, color: Theme.of(context).colorScheme.onBackground),
             ),
           ],
         ),
@@ -721,167 +721,147 @@ class _ListOrderState extends State<ListOrder> {
                                         size: 32,
                                         color: Colors.red,
                                       ),
-                                title: Row(
+                                title: Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.start,
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                                   children: [
-                                    Column(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
+                                Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
                                     Text(
                                       '${DateFormat('dd/MM/yy HH:mm').format(DateTime.parse(snapshot.data[i]['docdate']).toLocal())}',
                                       style: TextStyle(fontSize: 14),
+
                                     ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                                '${snapshot.data[i]['docno']}'),
-                                            snapshot.data[i]['status'] == 2
-                                                ? Card(
-                                              color: snapshot.data[i][
-                                              'tmppaymentname'] ==
-                                                  'cash'
-                                                  ? Colors.cyan
-                                                  : snapshot.data[i][
-                                              'tmppaymentname'] ==
-                                                  'qr'
-                                                  ? Colors.blue
-                                                  : Colors.green,
-                                              child: Container(
-                                                height: 20,
-                                                width: 40,
-                                                alignment:
-                                                Alignment.center,
-                                                child: Text(
-                                                  '${snapshot.data[i]['tmppaymentname']}',
-                                                  style: textBodyLage
-                                                      .copyWith(
-                                                      fontSize:
-                                                      10,
-                                                      color: Colors
-                                                          .white),
-                                                ),
-                                              ),
-                                            )
-                                                : snapshot.data[i]
-                                            ['status'] ==
-                                                3
-                                                ? Container(
-                                              height: 30,
-                                              width: 60,
-                                              alignment: Alignment
-                                                  .center,
-                                              child: Text(
-                                                'cancel',
-                                                style: textBodyLage.copyWith(
-                                                    fontSize: 12,
-                                                    color: Colors
-                                                        .red,
-                                                    fontWeight:
-                                                    FontWeight
-                                                        .bold),
-                                              ),
-                                            )
-                                                : Card(
-                                              color:
-                                              Colors.yellow,
-                                              child: Container(
-                                                height: 20,
-                                                width: 60,
-                                                alignment:
-                                                Alignment
-                                                    .center,
-                                                child: Text(
-                                                  'on hold',
-                                                  style: textBodyLage
-                                                      .copyWith(
-                                                      fontSize:
-                                                      10,
-                                                      color: Colors
-                                                          .black),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                                    Container(
+                                      alignment: Alignment.centerRight,
+                                      child: snapshot.data[i]
+                                      ['amount'] !=
+                                          null
+                                          ? Text(
+                                        ' ${oCcy.format(snapshot.data[i]['amount'])}',
+                                        style: textBodyLage
+                                            .copyWith(
+                                            fontSize:
+                                            16,
+                                            color: Colors
+                                                .black),
+                                      )
+                                          : Text(
+                                        '0',
+                                        style: textBodyLage
+                                            .copyWith(
+                                            fontSize:
+                                            18,
+                                            color: Colors
+                                                .black),
+                                      ),
+                                    )
+
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                        '${snapshot.data[i]['docno']}'),
+                                    snapshot.data[i]['status'] == 2
+                                        ? Card(
+                                      color: snapshot.data[i][
+                                      'tmppaymentname'] ==
+                                          'cash'
+                                          ? Colors.cyan
+                                          : snapshot.data[i][
+                                      'tmppaymentname'] ==
+                                          'qr'
+                                          ? Colors.blue
+                                          : Colors.green,
+                                      child: Container(
+                                        height: 20,
+                                        width: 40,
+                                        alignment:
+                                        Alignment.center,
+                                        child: Text(
+                                          '${snapshot.data[i]['tmppaymentname']}',
+                                          style: textBodyLage
+                                              .copyWith(
+                                              fontSize:
+                                              10,
+                                              color: Colors
+                                                  .white),
                                         ),
-
-                                      ],
+                                      ),
+                                    )
+                                        : snapshot.data[i]
+                                    ['status'] ==
+                                        3
+                                        ? Container(
+                                      height: 30,
+                                      width: 60,
+                                      alignment: Alignment
+                                          .center,
+                                      child: Text(
+                                        'cancel',
+                                        style: textBodyLage.copyWith(
+                                            fontSize: 12,
+                                            color: Colors
+                                                .red,
+                                            fontWeight:
+                                            FontWeight
+                                                .bold),
+                                      ),
+                                    )
+                                        : Card(
+                                      color:
+                                      Colors.yellow,
+                                      child: Container(
+                                        height: 20,
+                                        width: 60,
+                                        alignment:
+                                        Alignment
+                                            .center,
+                                        child: Text(
+                                          'on hold',
+                                          style: textBodyLage
+                                              .copyWith(
+                                              fontSize:
+                                              10,
+                                              color: Colors
+                                                  .black),
+                                        ),
+                                      ),
                                     ),
-                                    snapshot.data[i]['cusotomername'] != ''
-                                        ? Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Icon(LineIcons.userCircle),
-                                              Text(
-                                                  ' ${snapshot.data[i]['cusotomername']}'),
-                                            ],
-                                          )
-                                        : Row(),
-                                    snapshot.data[i]['description'] != ''
-                                        ? Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Icon(LineIcons.bookmark),
-                                              Text(
-                                                  ' ${snapshot.data[i]['description']}'),
-                                            ],
-                                          )
-                                        : Row(),
-                                      ],
-                                    ),
-                                    Expanded(child:   Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.end,
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        Expanded(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                              crossAxisAlignment: CrossAxisAlignment.end,
-                                              children: [
-                                                snapshot.data[i]
-                                                ['amount'] !=
-                                                    null
-                                                    ? Text(
-                                                  ' ${oCcy.format(snapshot.data[i]['amount'])}',
-                                                  style: textBodyLage
-                                                      .copyWith(
-                                                      fontSize:
-                                                      16,
-                                                      color: Colors
-                                                          .black),
-                                                )
-                                                    : Text(
-                                                  '0',
-                                                  style: textBodyLage
-                                                      .copyWith(
-                                                      fontSize:
-                                                      18,
-                                                      color: Colors
-                                                          .black),
-                                                ),
-
-                                              ],
-
-                                            )),
-
-                                      ],
-                                    ))
+                                  ],
+                                ),
+                                snapshot.data[i]['cusotomername'] != ''
+                                    ? Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Icon(LineIcons.userCircle),
+                                          Text(
+                                              ' ${snapshot.data[i]['cusotomername']}'),
+                                        ],
+                                      )
+                                    : Row(),
+                                snapshot.data[i]['description'] != ''
+                                    ? Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Icon(LineIcons.bookmark),
+                                          Text(
+                                              ' ${snapshot.data[i]['description']}'),
+                                        ],
+                                      )
+                                    : Row(),
                                   ],
                                 ),
                                 trailing: Icon(

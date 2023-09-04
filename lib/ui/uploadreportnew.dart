@@ -1,5 +1,4 @@
 
-import 'package:date_time_picker/date_time_picker.dart';
 import 'package:falconpos/ui/uploadreport.dart';
 import 'package:falconpos/widget/alert.dart';
 import 'package:http/http.dart' as http;
@@ -53,7 +52,20 @@ class _UPloadreportnewState extends State<UPloadreportnew> {
   final TextEditingController _de = TextEditingController();
   final TextEditingController _dateedit = TextEditingController();
 
+  Future displayDatePicker(BuildContext context) async {
+    var date = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(int.parse(DateFormat('yyyy').format(DateTime.now().toLocal()))),
+      lastDate: DateTime(int.parse(DateFormat('yyyy').format(DateTime.now().toLocal()))+1),
+    );
 
+    if (date != null) {
+      setState(() {
+        valueChanged2 = DateFormat('yyyy-MM-dd').format(date);
+      });
+    }
+  }
 
   int? _login = 0;
 
@@ -85,7 +97,7 @@ class _UPloadreportnewState extends State<UPloadreportnew> {
     // TODO: implement initState
     super.initState();
     gencode = new DateTime.now().millisecondsSinceEpoch.toString();
-    _dateedit.text = DateFormat('dd/MMM/yyyy').format(_dateshow);
+    valueChanged2 = DateFormat('dd/MMM/yyyy').format(_dateshow);
 
 
   }
@@ -175,26 +187,10 @@ class _UPloadreportnewState extends State<UPloadreportnew> {
                   width: 200,
                   child: Padding(
                       padding: EdgeInsets.all(20),
-                    child: DateTimePicker(
-                      decoration: inputForm1('DateTime'),
-                      type: DateTimePickerType.dateTime,
-                      dateMask: 'dd/MM/yy',
-                      controller: _dateedit,
-                      //initialValue: _initialValue,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                      //icon: Icon(Icons.event),
-                      dateLabelText: 'Date Time',
-                      use24HourFormat: true,
-                      initialDate: _dateshow.toLocal(),
-                      onChanged: (val) => setState(() => valueChanged2 = val),
-                      onSaved: (val) => setState(() {
-
-                        valueChanged2 =  DateFormat('dd/MM/yy').format(DateTime.parse(val!));
-
-
-                      } ),
-                    ),
+                    child: InkWell(
+                      onTap: ()=>displayDatePicker(context),
+                      child: Text('${valueChanged2}'),
+                    )
                   ),
                 ),
               ],
@@ -287,26 +283,10 @@ class _UPloadreportnewState extends State<UPloadreportnew> {
                   width: 200,
                   child: Padding(
                     padding: EdgeInsets.all(20),
-                    child: DateTimePicker(
-                      decoration: inputForm1('DateTime'),
-                      type: DateTimePickerType.dateTime,
-                      dateMask: 'dd/MM/yy',
-                      controller: _dateedit,
-                      //initialValue: _initialValue,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                      //icon: Icon(Icons.event),
-                      dateLabelText: 'Date Time',
-                      use24HourFormat: true,
-                      initialDate: _dateshow.toLocal(),
-                      onChanged: (val) => setState(() => valueChanged2 = val),
-                      onSaved: (val) => setState(() {
-
-                        valueChanged2 =  DateFormat('dd/MM/yy').format(DateTime.parse(val!));
-
-
-                      } ),
-                    ),
+                    child: InkWell(
+                      onTap: ()=>displayDatePicker(context),
+                      child: Text('${valueChanged2}'),
+                    )
                   ),
                 ),
               ],

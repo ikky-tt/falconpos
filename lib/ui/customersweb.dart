@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:country_picker/country_picker.dart';
-import 'package:date_time_picker/date_time_picker.dart';
+
 import 'package:falconpos/theme/textshow.dart';
 import 'package:falconpos/ui/mainpage.dart';
+import 'package:falconpos/ui/mainpos.dart';
 import 'package:falconpos/widget/addnewcustomer.dart';
 import 'package:falconpos/widget/alert.dart';
 
@@ -165,7 +166,7 @@ class _CustomerWebState extends State<CustomerWeb> {
                  MaterialPageRoute(
                  builder: (
                  context) =>
-                 MainPage(
+                 MainPOS(
                    genorder: widget.genoder,)));
            }, icon: Icon(Icons.arrow_back_ios,color: Colors.white,),
         ),
@@ -363,7 +364,7 @@ class _CustomerWebState extends State<CustomerWeb> {
                                                           MaterialPageRoute(
                                                               builder:
                                                                   (context) =>
-                                                                      MainPage(
+                                                                      MainPOS(
                                                                         custid: querySnapshot[i]
                                                                             ['id'],
                                                                         custcode:

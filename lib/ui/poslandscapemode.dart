@@ -5,6 +5,7 @@ import 'package:barcode_scan2/model/android_options.dart';
 import 'package:barcode_scan2/model/scan_options.dart';
 import 'package:barcode_scan2/platform_wrapper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:falconpos/ui/mainpos.dart';
 import 'package:falconpos/ui/sumpay.dart';
 import 'package:falconpos/widget/autoshowdistic.dart';
 import 'package:find_dropdown/find_dropdown.dart';
@@ -22,6 +23,7 @@ import '../model/usermodel.dart';
 import '../theme/textshow.dart';
 import '../widget/barcodescan.dart';
 import '../widget/discount.dart';
+import '../widget/discountmobile.dart';
 import '../widget/divbraek.dart';
 import '../widget/editdata.dart';
 import '../widget/numpad.dart';
@@ -54,7 +56,7 @@ class _POSLandscapeState extends State<POSLandscape> {
   List _controllerlist = [];
   List _controllerlist2 = [];
   String _docno = '';
-  late String genorder;
+  String genorder = '';
   String _sum = '0';
   String _custcode = '';
   String _custname = '';
@@ -126,7 +128,7 @@ class _POSLandscapeState extends State<POSLandscape> {
       }else {
         await ApiSerivces().chklogin(prefs.getInt('id')).then((e) async {
 
-          if(e.data.length == 0 || e.data[0]['emp_status'] == 2){
+          if(e.data.length == 0 || e.data[0]['emp_status'] == '2'){
 
             prefs.clear();
             await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> LoginPage()));
@@ -162,6 +164,16 @@ class _POSLandscapeState extends State<POSLandscape> {
     });
   }
 
+  ChekDiscount(proid,branchid,date) async {
+
+    var res = await ApiSerivces().CheckPromotion(proid, branchid, date);
+
+     var id = res.data[0]['sku'];
+     print("promotion");
+     print(id);
+
+
+  }
   ShowOrder(genorder) async {
     print('xxx');
 
@@ -190,6 +202,7 @@ class _POSLandscapeState extends State<POSLandscape> {
     TextEditingController _textbid = TextEditingController();
     TextEditingController _textsalech = TextEditingController();
     TextEditingController _textwh = TextEditingController();
+    TextEditingController _textsalename = TextEditingController();
     return showDialog(
       context: context,
       builder: (context) {
@@ -197,6 +210,7 @@ class _POSLandscapeState extends State<POSLandscape> {
           backgroundColor: Colors.white,
           content: SizedBox(
             height: MediaQuery.of(context).size.height*.4,
+            width: MediaQuery.of(context).size.width*.4,
             child: EditDateDate(
               dateshow: _dateshow,
               controller2: _controller2,
@@ -210,6 +224,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                   _brach = _textb.text;
                   _brachid = int.parse(_textbid.text);
                   _wh = _textwh.text;
+                  _empname = _textsalename.text;
 
 
                   Navigator.pop(context);
@@ -220,7 +235,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                 });
 
               },
-              branchid: _textbid, brancname: _textb, salechanel: _textsalech,wh: _textwh,),
+              branchid: _textbid, brancname: _textb, salechanel: _textsalech,wh: _textwh,salename: _textsalename,),
           ),
 
         );
@@ -344,20 +359,20 @@ class _POSLandscapeState extends State<POSLandscape> {
                           children: [
                             Container(
                               child: CircleAvatar(
+                                backgroundColor:  Theme.of(context).colorScheme.primary,
                                 radius: 30,
-                                backgroundColor: Theme.of(context)
-                                    .primaryColor, //<-- SEE HERE
+                             //<-- SEE HERE
                                 child: IconButton(
-                                  icon: const Icon(
+                                  icon:  Icon(
                                     Icons.home,
-                                    color: Colors.white,
+                                    color:Colors.white,
                                     size: 30,
                                   ),
                                   onPressed: () {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => MainPage()));
+                                            builder: (context) => MainPOS()));
                                   },
                                 ),
                               ),
@@ -367,11 +382,12 @@ class _POSLandscapeState extends State<POSLandscape> {
                             ),
                             Container(
                               child: CircleAvatar(
+                                backgroundColor:  Theme.of(context).colorScheme.primary,
                                 radius: 30,
-                                backgroundColor: Theme.of(context)
-                                    .primaryColor, //<-- SEE HERE
+
                                 child: IconButton(
-                                  icon: const Icon(
+
+                                  icon:  Icon(
                                     Icons.list,
                                     color: Colors.white,
                                     size: 30,
@@ -394,14 +410,14 @@ class _POSLandscapeState extends State<POSLandscape> {
                               decoration:  BoxDecoration(
                                 borderRadius:
                                 BorderRadius.all(Radius.circular(15)),
-                                color: Theme.of(context).primaryColor,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                               height: 60,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text(DateFormat('dd/MM/yy').format(_dateshow),style: textBodyMedium.copyWith(color: Colors.white,fontSize: 16),),
+                                  Text(DateFormat('dd/MM/yy').format(_dateshow),style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),),
 
                                   _lv==1?Container(
                                     padding: EdgeInsets.all(2),
@@ -457,15 +473,16 @@ class _POSLandscapeState extends State<POSLandscape> {
                                         child: Material(
                                           type: MaterialType.transparency,
                                           child: InkWell(
-                                            borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(
-                                                    _folded ? 32 : 0),
+                                            borderRadius: const BorderRadius.only(
+                                                topLeft: Radius.circular(32),
                                                 topRight: Radius.circular(32),
-                                                bottomLeft: Radius.circular(
-                                                    _folded ? 32 : 0),
-                                                bottomRight:
-                                                    Radius.circular(32)),
-                                            child: Padding(
+                                                bottomLeft: Radius.circular(32),
+                                                bottomRight: Radius.circular(32)),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(32),
+                                                  color: Theme.of(context).colorScheme.primary,
+                                                  boxShadow: kElevationToShadow[0]),
                                               padding: EdgeInsets.all(16.0),
                                               child: _folded
                                                   ? Icon(
@@ -499,7 +516,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                               child: Container(
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(32),
-                                    color: Theme.of(context).primaryColor,
+                                    color: Theme.of(context).colorScheme.primary,
                                     boxShadow: kElevationToShadow[0]),
                                 child: const Padding(
                                   padding: EdgeInsets.all(16.0),
@@ -528,13 +545,13 @@ class _POSLandscapeState extends State<POSLandscape> {
                               child: Container(
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(32),
-                                    color: Theme.of(context).primaryColor,
+                                    color: Theme.of(context).colorScheme.primary,
                                     boxShadow: kElevationToShadow[0]),
-                                child: const Padding(
+                                child:  Padding(
                                   padding: EdgeInsets.all(16.0),
                                   child: Icon(
                                     LineIcons.qrcode,
-                                    color: Colors.white,
+                                    color: Colors.white
                                   ),
                                 ),
                               ),
@@ -558,7 +575,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                                       LoadProudct('', _brachid);
                                     },
                                     child: Card(
-                                      color: Colors.green,
+                                      color: Theme.of(context).colorScheme.tertiary,
                                       elevation: 5,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
@@ -573,27 +590,16 @@ class _POSLandscapeState extends State<POSLandscape> {
                                             right: 10,
                                             bottom: 3),
                                         height: 50,
-                                        child: Text('All',
-                                            style: textBodyLage.copyWith(
-                                                fontSize: 14,
-                                                color: Colors.white)),
+                                        child: Text('All',style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onTertiary),),
                                       ),
                                     ),
                                   )),
                               Container(
                                 height: 60,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: Colors.black12,
-                                        blurRadius: 2,
-                                        offset: Offset(5, 0))
-                                  ],
-                                ),
+
                                 child: Icon(
                                   LineIcons.angleDoubleLeft,
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onBackground,
                                 ),
                               ),
                               Expanded(
@@ -603,9 +609,8 @@ class _POSLandscapeState extends State<POSLandscape> {
                                       AsyncSnapshot snapshot) {
                                     if (snapshot.hasData) {
                                       return ListView.builder(
+
                                         scrollDirection: Axis.horizontal,
-                                        physics:
-                                            const AlwaysScrollableScrollPhysics(),
                                         itemCount: snapshot.data.length,
                                         itemBuilder: (context, i) {
                                           return Padding(
@@ -618,7 +623,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                                                       _brachid);
                                                 },
                                                 child: Card(
-                                                  color: Colors.green,
+                                                  color: Theme.of(context).colorScheme.tertiary,
                                                   elevation: 5,
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
@@ -636,12 +641,8 @@ class _POSLandscapeState extends State<POSLandscape> {
                                                         bottom: 3),
                                                     height: 50,
                                                     child: Text(
-                                                        '${snapshot.data[i]['name']}',
-                                                        style: textBodyLage
-                                                            .copyWith(
-                                                                fontSize: 14,
-                                                                color: Colors
-                                                                    .white)),
+                                                        '${snapshot.data[i]['name']}',style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onTertiary),
+                                                       ),
                                                   ),
                                                 ),
                                               ));
@@ -656,18 +657,10 @@ class _POSLandscapeState extends State<POSLandscape> {
                               ),
                               Container(
                                 height: 60,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: Colors.black12,
-                                        blurRadius: 2,
-                                        offset: Offset(-5, 0))
-                                  ],
-                                ),
-                                child: const Icon(
+
+                                child:  Icon(
                                   LineIcons.angleDoubleRight,
-                                  color: Colors.white,
+                                    color: Theme.of(context).colorScheme.onBackground
                                 ),
                               ),
                             ],
@@ -690,6 +683,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                                       const AlwaysScrollableScrollPhysics(),
                                   itemCount: snapshot.data.length,
                                   itemBuilder: (context, i) {
+
                                     return Padding(
                                         padding: const EdgeInsets.all(5.0),
                                         child: InkWell(
@@ -711,7 +705,12 @@ class _POSLandscapeState extends State<POSLandscape> {
                                                         ? snapshot.data[i]
                                                             ['discount']
                                                         : 0,
-                                                    _wh)
+                                                    _wh,
+                                              snapshot.data[i]['promotionname'],
+                                              snapshot.data[i]['promotionid'],
+                                              _brachid
+
+                                            )
                                                 .then((value) =>
                                                     ShowOrder(genorder));
                                           },
@@ -766,7 +765,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                                                                     CircularProgressIndicator(
                                                                       color: Theme.of(
                                                                               context)
-                                                                          .primaryColor,
+                                                                          .colorScheme.primary,
                                                                     ),
                                                                   ],
                                                                 )),
@@ -808,7 +807,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                                                                               8)),
                                                               color: Theme.of(
                                                                       context)
-                                                                  .primaryColor,
+                                                                  .colorScheme.primary,
                                                             ),
                                                             child: Text(
                                                                 snapshot.data[i]['pcost'] == '' ||
@@ -819,10 +818,8 @@ class _POSLandscapeState extends State<POSLandscape> {
                                                                             'sellprice'])
                                                                     : oCcy.format(
                                                                         snapshot.data[i][
-                                                                            'pcost']),
-                                                                style: textLanadscapL
-                                                                    .copyWith(
-                                                                        fontSize: 18)),
+                                                                            'pcost']),style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold  ,color: Theme.of(context).colorScheme.error)
+                                                                ),
                                                           )),
                                                       snapshot.data[i][
                                                                   'discount'] !=
@@ -840,14 +837,11 @@ class _POSLandscapeState extends State<POSLandscape> {
                                                                       BorderRadius.all(
                                                                           Radius.circular(
                                                                               8)),
-                                                                  color: Colors
-                                                                      .red,
+                                                                  color:Theme.of(context).colorScheme.error,
                                                                 ),
                                                                 child: Text(
-                                                                    '${snapshot.data[i]['discount']}%',
-                                                                    style: textLanadscapL.copyWith(
-                                                                        fontSize:
-                                                                            16)),
+                                                                    '${snapshot.data[i]['discount']}%',style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold  ,color: Colors.white)
+                                                                   ),
                                                               ))
                                                           : Row()
                                                     ],
@@ -864,23 +858,15 @@ class _POSLandscapeState extends State<POSLandscape> {
                                                     children: [
                                                       Expanded(
                                                         child: Text(
-                                                            '${snapshot.data[i]['name']}',
-                                                            style: textBodyLage
-                                                                .copyWith(
-                                                                    fontSize:
-                                                                        14)),
+                                                            '${snapshot.data[i]['name']}',style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
+                                                          ),
                                                       ),
                                                       snapshot.data[i]
                                                                   ['sqty'] !=
                                                               null
                                                           ? Text(
-                                                              ' (${snapshot.data[i]['sqty']})',
-                                                              style: textBodyLage
-                                                                  .copyWith(
-                                                                      fontSize:
-                                                                          14,
-                                                                      color: Colors
-                                                                          .red))
+                                                              ' (${snapshot.data[i]['sqty']})',style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold  ,color: Colors.redAccent)
+                                                              )
                                                           : Row(),
                                                     ],
                                                   ),
@@ -892,7 +878,13 @@ class _POSLandscapeState extends State<POSLandscape> {
                                   },
                                 );
                               }
-                              return const Text("....");
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(),
+                                ],
+                              );
                             },
                           ),
                         )
@@ -900,11 +892,11 @@ class _POSLandscapeState extends State<POSLandscape> {
                     ),
                   ),
                 )),
-            Expanded(
+            Flexible(
                 flex: 1,
                 child: Container(
                   padding: EdgeInsets.fromLTRB(0, 30, 0, 10),
-                  color: Theme.of(context).primaryColor,
+                  color: Theme.of(context).colorScheme.primaryContainer,
                   height: MediaQuery.of(context).size.height,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -917,10 +909,10 @@ class _POSLandscapeState extends State<POSLandscape> {
                             width: 10,
                           ),
                           Container(
-                            decoration: const BoxDecoration(
+                            decoration:  BoxDecoration(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15)),
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onBackground,
                             ),
                             height: 50,
                             width: MediaQuery.of(context).size.width * .16,
@@ -930,47 +922,54 @@ class _POSLandscapeState extends State<POSLandscape> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Row(
+                                Expanded(child:  Row(
                                   children: [
                                     Icon(
                                       LineIcons.userCircle,
                                       size: 22,
+                                      color: Theme.of(context).colorScheme.background,
                                     ),
                                     SizedBox(
                                       width: 5,
                                     ),
                                     Text(
-                                      '${_empname}',
-                                      style: textLanadscapL.copyWith(
-                                          fontSize: 12, color: Colors.black),
+                                      '${_empname}',style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.background,),
+
+
                                     ),
                                   ],
-                                ),
-                                Row(
+                                ),),
+                                Expanded(child:  Row(
                                   children: [
                                     Icon(
                                       LineIcons.store,
                                       size: 20,
+                                      color: Theme.of(context).colorScheme.background,
                                     ),
                                     SizedBox(
                                       width: 5,
                                     ),
-                                    Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          '${_brach}',
-                                          style: textLanadscapL.copyWith(
-                                              fontSize: 12, color: Colors.black),
-                                        ),
-                                        _lv==1?Padding(
-                                          padding: const EdgeInsets.only(left: 4.0),
-                                          child: Text('${_salechanel}',style: textBodyMedium,),
-                                        ):Row(),
-                                      ],
-                                    ),
+                                   Expanded(child:     Column(
+                                     mainAxisAlignment: MainAxisAlignment.center,
+                                     children: [
+                                       Row(
+                                         children: [
+                                           Expanded(child: Text(
+                                             '${_brach}',style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.background,),
+                                             maxLines: 1,
+                                             overflow: TextOverflow.ellipsis,
+                                           ),)
+                                         ],
+                                       ),
+                                       _lv==1?Padding(
+                                         padding: const EdgeInsets.only(left: 4.0),
+                                         child: Text('${_salechanel}',style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.background,),),
+                                       ):Row(),
+                                     ],
+                                   ))
                                   ],
-                                ),
+                                ),)
+
                               ],
                             ),
                           ),
@@ -982,10 +981,11 @@ class _POSLandscapeState extends State<POSLandscape> {
                                           genoder: genorder,
                                         ))),
                             child: Container(
-                              decoration: const BoxDecoration(
+                              decoration:  BoxDecoration(
+                                color: Theme.of(context).colorScheme.onBackground,
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(15)),
-                                color: Colors.white,
+
                               ),
                               height: 50,
                               width: MediaQuery.of(context).size.width * .14,
@@ -996,13 +996,14 @@ class _POSLandscapeState extends State<POSLandscape> {
                                   Icon(
                                     LineIcons.userEdit,
                                     size: 22,
+                                    color: Theme.of(context).colorScheme.background,
                                   ),
                                   SizedBox(
                                     width: 5,
                                   ),
                                   widget.custid == null
                                       ? InkWell(
-                                          child: Icon(LineIcons.plus),
+                                          child: Icon(LineIcons.plus,color: Theme.of(context).colorScheme.background,),
                                         )
                                       : Container(
                                           height: 200,
@@ -1014,12 +1015,8 @@ class _POSLandscapeState extends State<POSLandscape> {
                                             children: [
                                               Expanded(
                                                 child: Text(
-                                                  '${widget.custname}',
+                                                  '${widget.custname}',style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.background,),
                                                   maxLines: 1,
-                                                  style:
-                                                      textLanadscapL.copyWith(
-                                                          fontSize: 14,
-                                                          color: Colors.black),
                                                 ),
                                               ),
                                               IconButton(
@@ -1032,7 +1029,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                                                     });
                                                   },
                                                   icon: Icon(
-                                                      LineIcons.timesCircle))
+                                                      LineIcons.timesCircle,color: Theme.of(context).colorScheme.background,))
                                             ],
                                           ),
                                         )
@@ -1048,7 +1045,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                       const SizedBox(
                         height: 10,
                       ),
-                      divb(),
+                      divb(context),
                       const SizedBox(
                         height: 10,
                       ),
@@ -1064,7 +1061,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                                 children: [
                                   Text(
                                     'No Data',
-                                    style: textLanadscapL,
+
                                   )
                                 ],
                               );
@@ -1098,12 +1095,15 @@ class _POSLandscapeState extends State<POSLandscape> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
+                                        _lv == 1?IconButton(onPressed: (){
+                                          discountbyitem(querySnapshot[i]['id'],querySnapshot[i]['price'],querySnapshot[i]['qty']);
+
+                                        }, icon: Icon(LineIcons.edit)):Row(),
                                         Expanded(
                                             flex: 2,
                                             child: Text(
                                               querySnapshot[i]['name'],
-                                              style: textLanadscapL.copyWith(
-                                                  fontSize: 14),
+
                                             )),
                                         Card(
                                           child: Container(
@@ -1113,9 +1113,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                                                 oCcy.format(
                                                     querySnapshot[i]['price']),
                                                 overflow: TextOverflow.ellipsis,
-                                                style: textLanadscapL.copyWith(
-                                                    fontSize: 14,
-                                                    color: Colors.black)),
+                                            )
                                           ),
                                         ),
                                         InkWell(
@@ -1133,10 +1131,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                                               width: 50,
                                               padding: EdgeInsets.all(5),
                                               child: Text('${qtyd}',
-                                                  style:
-                                                      textLanadscapL.copyWith(
-                                                          fontSize: 14,
-                                                          color: Colors.black)),
+                                                  ),
                                             ),
                                           ),
                                         ),
@@ -1153,9 +1148,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                                                             querySnapshot[i]
                                                                     ['price'] *
                                                                 qtyd),
-                                                        style: textLanadscapL
-                                                            .copyWith(
-                                                                fontSize: 20)),
+                                                     ),
                                                   )
                                                 : Container(
                                                     alignment:
@@ -1176,25 +1169,20 @@ class _POSLandscapeState extends State<POSLandscape> {
                                                                 querySnapshot[i]
                                                                     [
                                                                     'totprice']),
-                                                            style: textLanadscapL
-                                                                .copyWith(
-                                                                    fontSize:
-                                                                        20)),
+                                                           ),
                                                         Text(
                                                             oCcy.format(
                                                                 querySnapshot[
                                                                             i][
                                                                         'price'] *
                                                                     qtyd),
-                                                            style: textLanadscapL
-                                                                .copyWith(
-                                                                    fontSize:
-                                                                        14,
-                                                                    color: Colors
-                                                                        .red,
-                                                                    decoration:
-                                                                        TextDecoration
-                                                                            .lineThrough)),
+                                                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                                                fontSize: 12,
+                                                                color: Theme.of(context).colorScheme.error,
+                                                                decoration:
+                                                                TextDecoration
+                                                                    .lineThrough)
+                                                          ),
                                                       ],
                                                     ),
                                                   )),
@@ -1202,7 +1190,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                                           width: 20,
                                         ),
                                         InkWell(
-                                          child: Icon(Icons.remove_circle),
+                                          child: Icon(Icons.remove_circle,color: Theme.of(context).colorScheme.error,),
                                           onTap: () {
                                             ApiSerivces()
                                                 .DeleteItem(id)
@@ -1221,7 +1209,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                           },
                         ),
                       ),
-                      divb(),
+                      divb(context),
                       const SizedBox(
                         height: 10,
                       ),
@@ -1234,7 +1222,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                               children: [
                                 Row(
                                   children: [
-                                    Text('Subtotal', style: textLanadscapL),
+                                    Text('Subtotal',),
                                     Expanded(
                                       child: Row(
                                         crossAxisAlignment:
@@ -1242,39 +1230,20 @@ class _POSLandscapeState extends State<POSLandscape> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.end,
                                         children: [
-                                          Text("${oCcy.format(_subtot)}",
-                                              style: textLanadscapL)
+                                          Text("${_sum}",
+                                             )
                                         ],
                                       ),
                                     )
                                   ],
                                 ),
+
                                 const SizedBox(
                                   height: 5,
                                 ),
                                 Row(
                                   children: [
-                                    Text('Tax', style: textLanadscapL),
-                                    Expanded(
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          Text(oCcy.format(_tax),
-                                              style: textLanadscapL)
-                                        ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                Row(
-                                  children: [
-                                    Text('Discount', style: textLanadscapL),
+                                    Text('Discount', ),
                                     Expanded(
                                       child: Row(
                                         crossAxisAlignment:
@@ -1283,7 +1252,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                                             MainAxisAlignment.end,
                                         children: [
                                           Text(_discounttext,
-                                              style: textLanadscapL)
+                                            )
                                         ],
                                       ),
                                     )
@@ -1301,32 +1270,24 @@ class _POSLandscapeState extends State<POSLandscape> {
                                       width: MediaQuery.of(context).size.width *
                                           .09,
                                       child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                              elevation: 0,
-                                              backgroundColor:
-                                                  HexColor('7CB4D9')),
+
                                           onPressed: () {},
                                           child: Text(
                                             'Coupon',
-                                            style: textLanadscapL.copyWith(
-                                                fontSize: 14),
+
                                           )),
                                     ),
                                     SizedBox(
                                       width: MediaQuery.of(context).size.width *
                                           .2,
                                       child: ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                              elevation: 0,
-                                              backgroundColor:
-                                                  HexColor('7CB4D9')),
+
                                           onPressed: () {
                                             discount(genorder);
                                           },
                                           child: Text(
                                             'Discount',
-                                            style: textLanadscapL.copyWith(
-                                                fontSize: 14),
+
                                           )),
                                     ),
                                   ],
@@ -1336,9 +1297,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                                     children: [
                                       Expanded(
                                         child: ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                                elevation: 0,
-                                                backgroundColor: Colors.white),
+
                                             onPressed: () {
                                               _count != '0'
                                                   ? ConfirmOrder()
@@ -1353,14 +1312,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                                                 children: [
                                                   Text(
                                                     'PLACE ORDER ฿ ${oCcy.format(_sumtot)} ',
-                                                    style:
-                                                        textBodyLage.copyWith(
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .primaryColor,
-                                                            fontWeight:
-                                                                FontWeight.w800,
-                                                            fontSize: 21),
+
                                                   ),
                                                 ],
                                               ),
@@ -1389,7 +1341,7 @@ class _POSLandscapeState extends State<POSLandscape> {
       builder: (BuildContext context) => AlertDialog(
         title: Text(
           itemname,
-          style: textBodyLage.copyWith(fontSize: 18),
+
         ),
         content: Container(
           width: MediaQuery.of(context).size.width * .20,
@@ -1441,7 +1393,7 @@ class _POSLandscapeState extends State<POSLandscape> {
         builder: (BuildContext context) => AlertDialog(
             title: Text(
               'Discount',
-              style: textBodyLage.copyWith(fontSize: 18,color: Colors.blueAccent),
+
             ),
             content: Discount(
                 buttonSize: MediaQuery.of(context).size.height * .11,
@@ -1462,6 +1414,46 @@ class _POSLandscapeState extends State<POSLandscape> {
                 })));
   }
 
+  Future discountbyitem(id,price,qty) {
+    TextEditingController _disconuttextbyitem = TextEditingController();
+    TextEditingController _discountstatsbyitem = TextEditingController();
+
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+            title: Text(
+              'Discount',
+              style: textBodyLage.copyWith(fontSize: 18,color: Colors.black),
+            ),
+            content: Discount(
+                buttonSize: MediaQuery.of(context).size.height * .11,
+                buttonColor: Colors.white38,
+                controller: _disconuttextbyitem,
+                discountstatus: _discountstatsbyitem,
+                onSubmit: () async {
+                  print(_disconuttextbyitem.text);
+                  print(_discountstatsbyitem.text);
+
+                  if(_discountstatsbyitem.text == '1') {
+
+                    await   ApiSerivces().UpDateItemDiscount(id, num.parse(_disconuttextbyitem.text));
+
+                  } else {
+                    var _idsi = num.parse(_disconuttextbyitem.text)/100 * (qty*price);
+                    await   ApiSerivces().UpDateItemDiscount(id,_idsi );
+                  }
+
+                  setState(() {
+
+                    SumPos(genorder);
+                    ShowOrder(genorder);
+                  });
+
+                  Navigator.of(context).pop();
+
+                })));
+  }
+
   Future ConfirmOrder() {
     return showDialog(
         context: context,
@@ -1479,14 +1471,16 @@ class _POSLandscapeState extends State<POSLandscape> {
                     child: Column(
                       children: [
                         Icon(
-                          Icons.check_circle_outline,
+                          LineIcons.exclamationCircle,
                           size: 124,
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        SizedBox(
+                          height: 20,
                         ),
                         Text(
                           'Please check your order confirmation',
-                          style: textBodyMedium.copyWith(
-                              fontSize: 16, color: Colors.black),
+
                         )
                       ],
                     ),
@@ -1497,19 +1491,20 @@ class _POSLandscapeState extends State<POSLandscape> {
                     children: [
                       ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.redAccent),
+                              backgroundColor: Theme.of(context).colorScheme.error),
+
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
                           child: Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Text('Cancel',
-                                style: textBodyLage.copyWith(fontSize: 18)),
+                               ),
                           )),
                       ElevatedButton(
-                          onPressed: () {
+                          onPressed: ()  async {
                             if(_chkmodifile){
-                              ApiSerivces()
+                              await ApiSerivces()
                                   .PosAdd2(
                                   _docno,
                                   genorder,
@@ -1526,17 +1521,18 @@ class _POSLandscapeState extends State<POSLandscape> {
                                   _empname,
                                   _salechanel,
                                   _dateshow)
-                                  .then((e) => {
-                                ApiSerivces()
+                                  .then((e) async  {
+                                    print(e);
+                               await ApiSerivces()
                                     .Updatestockoutapi(genorder, _empname)
                                     .then((i) => Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => SumPay(
-                                            genorder: genorder))))
+                                            genorder: genorder))));
                               });
                             } else {
-                              ApiSerivces()
+                            await  ApiSerivces()
                                   .PosAdd(
                                   _docno,
                                   genorder,
@@ -1551,14 +1547,14 @@ class _POSLandscapeState extends State<POSLandscape> {
                                   _brachid,
                                   _wh,
                                   _empname)
-                                  .then((e) => {
-                                ApiSerivces()
+                                  .then((e)  async {
+                              await  ApiSerivces()
                                     .Updatestockoutapi(genorder, _empname)
                                     .then((i) => Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => SumPay(
-                                            genorder: genorder))))
+                                            genorder: genorder))));
                               });
                             }
                           },
@@ -1566,7 +1562,7 @@ class _POSLandscapeState extends State<POSLandscape> {
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
                               'Confirm',
-                              style: textBodyLage.copyWith(fontSize: 18),
+
                             ),
                           )),
                     ],
@@ -1652,7 +1648,10 @@ class _POSLandscapeState extends State<POSLandscape> {
                     ee.data[0]['sellprice'],
                     ee.data[0]
                     ['discount'] ?? 0,
-                    _wh)
+                    _wh,
+                  ee.data[0]['promotionname'],
+                   ee.data[0]['promotionid'],
+                  _brachid)
                     .then((v) {
                   setState(() {
 

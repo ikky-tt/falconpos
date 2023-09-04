@@ -2,16 +2,20 @@
 import 'package:falconpos/api/apiservice.dart';
 
 import 'package:falconpos/ui/cyclecount.dart';
+import 'package:falconpos/ui/dashboard.dart';
 import 'package:falconpos/ui/item.dart';
 import 'package:falconpos/ui/listorder.dart';
 import 'package:falconpos/ui/login.dart';
 import 'package:falconpos/ui/mainpage.dart';
+import 'package:falconpos/ui/mainpos.dart';
 import 'package:falconpos/ui/received.dart';
 import 'package:falconpos/ui/report.dart';
 import 'package:falconpos/ui/setting.dart';
 import 'package:falconpos/ui/uploadreport.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:intl/intl.dart';
 
@@ -20,6 +24,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/menmodel.dart';
 import '../theme/textshow.dart';
+import '../theme/theme_services.dart';
 
 class MainMenu extends StatefulWidget {
   const MainMenu({Key? key}) : super(key: key);
@@ -32,12 +37,19 @@ class _MainMenuState extends State<MainMenu> {
 
   List<ListMenuShow> _memu = [];
   final oCcy = NumberFormat("#,###.##", "th_TH");
+  bool isSwitched = false;
 
+  final _box = GetStorage();
+  final _key = 'isDarkMode';
+  String _nameshow = '';
+
+  bool _loadthme() => _box.read(_key) ?? false;
 @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _memu.add(ListMenuShow(name: 'POS', icon: Icon(LineIcons.shoppingBag,color: Colors.black,size: 40,), link: MainPage()));
+    _memu.add(ListMenuShow(name: 'DashBorad', icon: Icon(LineIcons.chalkboard,color: Colors.black,size: 40,), link: DashBorad()));
+    _memu.add(ListMenuShow(name: 'POS', icon: Icon(LineIcons.shoppingBag,color: Colors.black,size: 40,), link: MainPOS()));
     _memu.add(ListMenuShow(name: 'ListOrder', icon: Icon(LineIcons.list,color: Colors.black,size: 40), link: ListOrder()));
     _memu.add(ListMenuShow(name: 'Daily update', icon: Icon(LineIcons.upload,color: Colors.black,size: 40), link: UPloadReport()));
     _memu.add(ListMenuShow(name: 'Received', icon: Icon(LineIcons.qrcode,color: Colors.black,size: 40), link: received()));
@@ -69,6 +81,7 @@ class _MainMenuState extends State<MainMenu> {
         ),
         title: Text('Menu',style: textBodyLage,),
         centerTitle: true,
+
       ),
       body: OrientationBuilder(
         builder: (context, orientation) {
@@ -108,7 +121,7 @@ class _MainMenuState extends State<MainMenu> {
                           Navigator.push(context, MaterialPageRoute(builder: (context)=>_memu[i].link));
                         },
                         child: Card(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.primaryContainer,
                           child: Container(
                               padding: EdgeInsets.all(10),
                               child: Column(
@@ -129,7 +142,7 @@ class _MainMenuState extends State<MainMenu> {
                                   ),
                                   Text('${_memu[i].name}',
                                     style: textBodyLage.copyWith(
-                                        fontSize: 18,color: Colors.black),
+                                        fontSize: 18,color: Theme.of(context).colorScheme.onBackground),
                                   ),
                                 ],
                               )
@@ -164,7 +177,13 @@ class _MainMenuState extends State<MainMenu> {
 
 
 
-                await   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> LoginPage()));
+                if(kIsWeb){
+                  (context).go('/login');
+                } else {
+                  await Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => LoginPage()));
+                }
+
 
               },
               child: Column(
@@ -250,6 +269,26 @@ class _MainMenuState extends State<MainMenu> {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
+            !kIsWeb?Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: IconButton(
+                        onPressed: (){
+                          print(_loadthme());
+                          setState(() {
+                            isSwitched = true;
+                            themeService().switchTheme();
+                          });
+                        },
+                        icon: Icon(_loadthme()?LineIcons.lightbulb:LineIcons.moon,size: 50 ,),color: Theme.of(context).colorScheme.onBackground ,),
+                  )
+                ],
+              ),
+            ):Row(),
             Padding(
               padding: const EdgeInsets.only(left: 30.0,bottom: 20,right: 30),
               child: InkWell(
@@ -261,13 +300,17 @@ class _MainMenuState extends State<MainMenu> {
 
                   });
 
-
-
-                  await   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> LoginPage()));
+                  if(kIsWeb){
+                    (context).go('/login');
+                  } else {
+                    await Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => LoginPage()));
+                  }
 
                 },
                 child: Column(
                   children: [
+
                     Icon(LineIcons.alternateSignOut,size: 40,),
                     Text("Logout",style: textBodyLage.copyWith(fontSize: 16,color: Colors.black),)
                   ],

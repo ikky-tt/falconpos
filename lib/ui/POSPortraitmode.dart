@@ -2,8 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:badges/badges.dart' as badges;
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:date_time_picker/date_time_picker.dart';
+
 import 'package:falconpos/ui/customersweb.dart';
+import 'package:falconpos/ui/mainpos.dart';
 import 'package:falconpos/ui/sumpay.dart';
 import 'package:falconpos/widget/discountmobile.dart';
 import 'package:find_dropdown/find_dropdown.dart';
@@ -92,6 +93,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
   final StreamController _stream3 = StreamController();
   final TextEditingController _scr = TextEditingController();
   final TextEditingController _barcodetext = TextEditingController();
+  final TextEditingController _discountbyitemtext = TextEditingController();
 
   DocNo() async {
     await ApiSerivces().ApiDocno().then((res) {
@@ -127,7 +129,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
       } else {
        await ApiSerivces().chklogin(prefs.getInt('id')).then((e) async {
 
-         if(e.data.length == 0 || e.data[0]['emp_status'] == 2){
+         if(e.data.length == 0 || e.data[0]['emp_status'] == '2'){
 
            prefs.clear();
           await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> LoginPage()));
@@ -366,7 +368,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                               child: CircleAvatar(
                                 radius: 20,
                                 backgroundColor:
-                                Theme.of(context).primaryColor, //<-- SEE HERE
+                                Theme.of(context).colorScheme.primary, //<-- SEE HERE
                                 child: IconButton(
                                   icon: const Icon(
                                     Icons.home,
@@ -377,7 +379,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => MainPage()));
+                                            builder: (context) => MainPOS()));
                                   },
                                 ),
                               ),
@@ -389,7 +391,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                               child: CircleAvatar(
                                 radius: 20,
                                 backgroundColor:
-                                Theme.of(context).primaryColor, //<-- SEE HERE
+                                Theme.of(context).colorScheme.primary, //<-- SEE HERE
                                 child: IconButton(
                                   icon: const Icon(
                                     Icons.list,
@@ -417,7 +419,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                   Container(
                                     decoration:  BoxDecoration(
                                       borderRadius: BorderRadius.all(Radius.circular(15)),
-                                      color: Theme.of(context).primaryColor,
+                                      color:   Theme.of(context).colorScheme.primary,
                                     ),
                                     height: 40,
                                     width: MediaQuery.of(context).size.width*.45,
@@ -480,7 +482,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                             child: Row(
                                               children: [
                                                 Icon(LineIcons.clipboard,color: Colors.white,),
-                                                Text(' ${_salechanel}',style: textBodyMedium.copyWith(color: Colors.white),),
+                                                Expanded(child: Text(' ${_salechanel}',style: textBodyMedium.copyWith(color: Colors.white),maxLines: 1,overflow: TextOverflow.ellipsis,)),
                                               ],
                                             ),
                                           ),
@@ -497,7 +499,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                       decoration:  BoxDecoration(
                                         borderRadius:
                                         BorderRadius.all(Radius.circular(15)),
-                                        color: Theme.of(context).primaryColor,
+                                        color:   Theme.of(context).colorScheme.primary,
                                       ),
                                       height: 40,
                                       width: MediaQuery.of(context).size.width*.24,
@@ -573,7 +575,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                               decoration:  BoxDecoration(
                                 borderRadius:
                                 BorderRadius.all(Radius.circular(15)),
-                                color: Theme.of(context).primaryColor,
+                                color:  Theme.of(context).colorScheme.primary,
                               ),
                               height: 40,
                               child: Row(
@@ -623,11 +625,11 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                               child: kIsWeb?CircleAvatar(
                                 radius: 20,
                                 backgroundColor:
-                                Theme.of(context).primaryColor, //<-- SEE HERE
+                                Theme.of(context).colorScheme.primary, //<-- SEE HERE
                                 child: IconButton(
-                                  icon: const Icon(
+                                  icon:  Icon(
                                     LineIcons.barcode,
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.onBackground,
                                     size: 20,
                                   ),
                                   onPressed: () {
@@ -641,11 +643,11 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                               ):CircleAvatar(
                                 radius: 20,
                                 backgroundColor:
-                                Theme.of(context).primaryColor, //<-- SEE HERE
+                                Theme.of(context).colorScheme.primary, //<-- SEE HERE
                                 child: IconButton(
-                                  icon: const Icon(
+                                  icon:  Icon(
                                     LineIcons.qrcode,
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.background,
                                     size: 20,
                                   ),
                                   onPressed: () {
@@ -674,7 +676,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                       LoadProudct('', _brachid);
                                     },
                                     child: Card(
-                                      color: Colors.green,
+                                      color:   Theme.of(context).colorScheme.tertiary,
                                       elevation: 5,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
@@ -692,20 +694,20 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                         child: Text('All',
                                             style: textBodyLage.copyWith(
                                                 fontSize: 14,
-                                                color: Colors.white)),
+                                                color: Theme.of(context).colorScheme.onTertiary)),
                                       ),
                                     ),
                                   )),
                               Container(
                                 width: 5,
                                 height: 40,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
+                                decoration:  BoxDecoration(
+                                  color:   Theme.of(context).colorScheme.onInverseSurface,
                                   boxShadow: [
                                     BoxShadow(
-                                        color: Colors.black12,
-                                        blurRadius: 2,
-                                        offset: Offset(5, 0))
+                                        color:   Theme.of(context).colorScheme.outline,
+                                        blurRadius: 10,
+                                        offset: Offset(6, 0))
                                   ],
                                 ),
                                 child: Icon(
@@ -735,7 +737,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                                       _brachid);
                                                 },
                                                 child: Card(
-                                                  color: Colors.green,
+                                                  color:   Theme.of(context).colorScheme.tertiary,
                                                   elevation: 5,
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
@@ -756,8 +758,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                                         style:
                                                         textBodyLage.copyWith(
                                                             fontSize: 12,
-                                                            color: Colors
-                                                                .white)),
+                                                            color: Theme.of(context).colorScheme.onTertiary)),
                                                   ),
                                                 ),
                                               ));
@@ -773,13 +774,13 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                               Container(
                                 width: 5,
                                 height: 60,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
+                                decoration:  BoxDecoration(
+                                  color:   Theme.of(context).colorScheme.onPrimary,
                                   boxShadow: [
                                     BoxShadow(
-                                        color: Colors.black12,
-                                        blurRadius: 2,
-                                        offset: Offset(-5, 0))
+                                        color:   Theme.of(context).colorScheme.outline,
+                                        blurRadius: 10,
+                                        offset: Offset(-6, 0))
                                   ],
                                 ),
                                 child: const Icon(
@@ -826,7 +827,10 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                                     ? snapshot.data[i]
                                                 ['discount']
                                                     : 0,
-                                                _wh)
+                                                _wh,
+                                              snapshot.data[i]['promotionname'],
+                                              snapshot.data[i]['promotionid'],
+                                            _brachid)
                                                 .then((value){
                                                   setState(() {
                                                     SumPos(genorder);
@@ -840,11 +844,11 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                             decoration: BoxDecoration(
                                               borderRadius: BorderRadius.all(
                                                   Radius.circular(20)),
-                                              color: HexColor('7CB4D9'),
-                                              boxShadow: const [
+                                              color: Theme.of(context).colorScheme.primary,
+                                              boxShadow:  [
                                                 BoxShadow(
-                                                    color: Colors.black12,
-                                                    blurRadius: 3,
+                                                    color:   Theme.of(context).colorScheme.onInverseSurface,
+                                                    blurRadius: 6,
                                                     spreadRadius: 2,
                                                     offset: Offset(0, 2)),
                                               ],
@@ -881,7 +885,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                                                       CircularProgressIndicator(
                                                                         color: Theme.of(
                                                                             context)
-                                                                            .primaryColor,
+                                                                            .colorScheme.primary,
                                                                       ),
                                                                     ],
                                                                   )),
@@ -914,7 +918,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                                                   8)),
                                                               color: Theme.of(
                                                                   context)
-                                                                  .primaryColor,
+                                                                  .colorScheme.primary,
                                                             ),
                                                             child: Text(
                                                                 snapshot.data[i]['pcost'] == '' ||
@@ -1016,7 +1020,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                yourScrollController = new ScrollController(initialScrollOffset: 0);
               showModalBottomSheet<void>(
                 isScrollControlled: true,
-                backgroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.background,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadiusDirectional.only(
                     topEnd: Radius.circular(25),
@@ -1037,7 +1041,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                         width: MediaQuery
                             .of(context)
                             .size
-                            .width*.8 ,
+                            .width*.95,
 
 
                         child: Center(
@@ -1093,14 +1097,19 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                               mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                               children: [
+                                                _lv == 1?IconButton(onPressed: (){
+                                                  discountbyitem(querySnapshot[i].id,querySnapshot[i].price,querySnapshot[i].qty);
+
+                                                }, icon: Icon(LineIcons.edit)):Row(),
                                                 SizedBox(
-                                                    width: MediaQuery.of(context).size.width*.3,
+                                                    width: MediaQuery.of(context).size.width*.26,
                                                     child: Text(
                                                       querySnapshot[i].name,
                                                       style: textLanadscapL.copyWith(
-                                                          fontSize: 14,color: Colors.black),
+                                                          fontSize: AdaptiveTextSize().getadaptiveTextSize(context, 16),color: Theme.of(context).colorScheme.onBackground),
                                                     )),
                                                 Card(
+                                                  color:Theme.of(context).colorScheme.secondaryContainer,
                                                   child: Container(
                                                     alignment: Alignment.center,
                                                     width: 50,
@@ -1109,11 +1118,12 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                                             querySnapshot[i].price),
                                                         overflow: TextOverflow.ellipsis,
                                                         style: textLanadscapL.copyWith(
-                                                            fontSize: 14,
-                                                            color: Colors.black)),
+                                                            fontSize: AdaptiveTextSize().getadaptiveTextSize(context, 16),
+                                                            color: Theme.of(context).colorScheme.onSecondaryContainer)),
                                                   ),
                                                 ),
                                                 Card(
+                                                  color:Theme.of(context).colorScheme.secondaryContainer,
                                                   child: Container(
                                                     alignment: Alignment.center,
                                                     width: 80,
@@ -1155,13 +1165,13 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
 
                                                           },
                                                           child: Icon
-                                                            (LineIcons.minusCircle),
+                                                            (LineIcons.minusCircle,color: Theme.of(context).colorScheme.onSecondaryContainer,),
                                                         ),
 
                                                         Text('${qtyd}',
                                                             style: textLanadscapL.copyWith(
-                                                                fontSize: 14,
-                                                                color: Colors.black)),
+                                                                fontSize: AdaptiveTextSize().getadaptiveTextSize(context, 16),
+                                                                color: Theme.of(context).colorScheme.onSecondaryContainer)),
                                                         InkWell(
                                                           onTap: (){
                                                             qtyd = qtyd + 1;
@@ -1198,7 +1208,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
 
 
                                                           },
-                                                          child: Icon(LineIcons.plusCircle),
+                                                          child: Icon(LineIcons.plusCircle,color: Theme.of(context).colorScheme.onSecondaryContainer,),
                                                         ),
 
                                                       ],
@@ -1218,7 +1228,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                                                   qtyd),
                                                           style: textLanadscapL
                                                               .copyWith(
-                                                              fontSize: 14,color: Colors.black)),
+                                                              fontSize: AdaptiveTextSize().getadaptiveTextSize(context, 20),color: Theme.of(context).colorScheme.onBackground)),
                                                     )
                                                         : Container(
                                                       alignment:
@@ -1236,19 +1246,16 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                                           Text(
                                                               oCcy.format(
                                                                   querySnapshot[i].totprice),
-                                                              style: textLanadscapL
-                                                                  .copyWith(
+                                                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                                                   fontSize:
-                                                                  16,color: Colors.black)),
+                                                                  AdaptiveTextSize().getadaptiveTextSize(context, 20),color: Theme.of(context).colorScheme.onBackground)),
                                                           Text(
                                                               oCcy.format(
                                                                   querySnapshot[i].price *
                                                                       qtyd),
-                                                              style: textLanadscapL
-                                                                  .copyWith(
+                                                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                                                   fontSize: 12,
-                                                                  color: Colors
-                                                                      .red,
+                                                                  color: Theme.of(context).colorScheme.error,
                                                                   decoration:
                                                                   TextDecoration
                                                                       .lineThrough)),
@@ -1259,7 +1266,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                                   width: 5,
                                                 ),
                                                 InkWell(
-                                                  child: Icon(Icons.remove_circle),
+                                                  child: Icon(Icons.remove_circle,color: Theme.of(context).colorScheme.error,),
                                                   onTap: () {
                                                     ApiSerivces()
                                                         .DeleteItem(id)
@@ -1277,7 +1284,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                                   },
                                                 ),
                                                 const SizedBox(
-                                                  width: 10,
+                                                  width: 5,
                                                 ),
                                               ],
                                             ),
@@ -1356,22 +1363,22 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                   }
 
                                   return  SizedBox(
-                                      height: 220,
+                                      height: 150,
                                       child: Padding(
                                         padding: const EdgeInsets.only(right: 20.0, left: 20),
                                         child: Column(
                                           children: [
                                             Row(
                                               children: [
-                                                Text('Subtotal ${_count!= '0' ?"Item : ${_count}":''}', style: textLanadscapL.copyWith(color: Colors.black)),
+                                                Text('Subtotal ${_count!= '0' ?"Item : ${_count}":''}', style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: AdaptiveTextSize().getadaptiveTextSize(context, 20))),
                                                 Expanded(
                                                   child: Row(
                                                     crossAxisAlignment:
                                                     CrossAxisAlignment.center,
                                                     mainAxisAlignment: MainAxisAlignment.end,
                                                     children: [
-                                                      Text("${oCcy.format(_subtot)}",
-                                                          style: textLanadscapL.copyWith(color: Colors.black))
+                                                      Text("${oCcy.format(_sumt)}",
+                                                          style:  Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: AdaptiveTextSize().getadaptiveTextSize(context, 20)))
                                                     ],
                                                   ),
                                                 )
@@ -1380,28 +1387,10 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                             const SizedBox(
                                               height: 5,
                                             ),
+
                                             Row(
                                               children: [
-                                                Text('Tax', style: textLanadscapL.copyWith(color: Colors.black)),
-                                                Expanded(
-                                                  child: Row(
-                                                    crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                    mainAxisAlignment: MainAxisAlignment.end,
-                                                    children: [
-                                                      Text(oCcy.format(_tax),
-                                                          style: textLanadscapL.copyWith(color: Colors.black))
-                                                    ],
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              height: 5,
-                                            ),
-                                            Row(
-                                              children: [
-                                                Text('Discount', style: textLanadscapL.copyWith(color: Colors.black)),
+                                                Text('Discount', style:  Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: AdaptiveTextSize().getadaptiveTextSize(context, 20))),
                                                 Expanded(
                                                   child: Row(
                                                     crossAxisAlignment:
@@ -1409,7 +1398,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                                     mainAxisAlignment: MainAxisAlignment.end,
                                                     children: [
                                                       Text(_dicounttext,
-                                                          style: textLanadscapL.copyWith(color: Colors.black))
+                                                          style:  Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: AdaptiveTextSize().getadaptiveTextSize(context, 20)))
                                                     ],
                                                   ),
                                                 )
@@ -1429,8 +1418,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                                   child: ElevatedButton(
                                                       style: ElevatedButton.styleFrom(
                                                           elevation: 0,
-                                                          backgroundColor:
-                                                          HexColor('7CB4D9')),
+                                                          backgroundColor: Theme.of(context).colorScheme.primary),
                                                       onPressed: () {
                                                         Navigator.of(context).pop();
                                                         discount(genorder);
@@ -1448,8 +1436,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                                   child: ElevatedButton(
                                                       style: ElevatedButton.styleFrom(
                                                           elevation: 0,
-                                                          backgroundColor:
-                                                          HexColor('7CB4D9')),
+                                                          backgroundColor:Theme.of(context).colorScheme.primary),
                                                       onPressed: () {},
                                                       child: Text(
                                                         'Coupon',
@@ -1467,8 +1454,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                                     child: ElevatedButton(
                                                         style: ElevatedButton.styleFrom(
                                                             elevation: 0,
-                                                            backgroundColor: Theme.of(context)
-                                                                .primaryColor),
+                                                            backgroundColor: Theme.of(context).colorScheme.primary),
                                                         onPressed: () {
                                                           _count != '0'
                                                               ? ConfirmOrder()
@@ -1519,11 +1505,11 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
             label: Row(
               children: [
             badges.Badge(
-                  badgeContent: Text('${_count}', style: textBody.copyWith(
+                  badgeContent: Text('${_count}', style: Theme.of(context).textTheme.labelMedium?.copyWith(
                       fontSize: 13, fontWeight: FontWeight.bold),),
-                  child: Icon(LineIcons.shoppingBasket, size: 24,color: Colors.white,),
+                  child: Icon(LineIcons.shoppingBasket, size: 24,color: Theme.of(context).colorScheme.background,),
                 badgeStyle: badges.BadgeStyle(
-                  badgeColor: Colors.white
+                  badgeColor: Theme.of(context).colorScheme.background
                 )
 
                 ),
@@ -1533,7 +1519,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                 Text('Total : ${oCcy.format(_sumtot)}',style: textBody.copyWith(color: Colors.white),)
               ],
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         )
     );
@@ -1570,13 +1556,55 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                 })));
   }
 
+
+  Future discountbyitem(id,price,qty) {
+    TextEditingController _disconuttextbyitem = TextEditingController();
+    TextEditingController _discountstatsbyitem = TextEditingController();
+
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+            title: Text(
+              'Discount',
+              style: textBodyLage.copyWith(fontSize: 18,color: Colors.black),
+            ),
+            content: DiscountMobile(
+                buttonSize: MediaQuery.of(context).size.height * .11,
+                buttonColor: Colors.white38,
+                controller: _disconuttextbyitem,
+                discountstatus: _discountstatsbyitem,
+                onSubmit: () async {
+                  print(_disconuttextbyitem.text);
+                  print(_discountstatsbyitem.text);
+
+                  if(_discountstatsbyitem.text == '1') {
+
+                 await   ApiSerivces().UpDateItemDiscount(id, num.parse(_disconuttextbyitem.text));
+
+                  } else {
+                    var _idsi = num.parse(_disconuttextbyitem.text)/100 * (qty*price);
+                    await   ApiSerivces().UpDateItemDiscount(id,_idsi );
+                  }
+
+                  setState(() {
+
+                    SumPos(genorder);
+                    ShowOrder(genorder);
+                  });
+
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                })));
+  }
+
+
   Future ConfirmOrder() {
     return showDialog(
         context: context,
         builder: (BuildContext context) => AlertDialog(
             content: SizedBox(
               height: MediaQuery.of(context).size.height * .3,
-              width: MediaQuery.of(context).size.width * .3,
+              width: MediaQuery.of(context).size.width * .8,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -1587,14 +1615,17 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                         child: Column(
                           children: [
                             Icon(
-                              Icons.check_circle_outline,
-                              size: 124,
-                              color: Theme.of(context).primaryColor,
+                              LineIcons.exclamationCircle,
+                              size: 80,
+                              color: Theme.of(context).colorScheme.primary
+                            ),
+                            SizedBox(
+                              height: 30,
                             ),
                             Text(
                               'Please check your order confirmation',
                               style: textBodyMedium.copyWith(
-                                  fontSize: 16, color: Colors.black),
+                                  fontSize: 14, color: Theme.of(context).colorScheme.onBackground),
                             )
                           ],
                         ),
@@ -1605,7 +1636,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                     children: [
                       ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.redAccent),
+                              backgroundColor: Theme.of(context).colorScheme.error),
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
@@ -1615,6 +1646,8 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                                 style: textBodyLage.copyWith(fontSize: 18)),
                           )),
                       ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.primary),
                           onPressed: () {
                            if(_chkmodifile){
                              ApiSerivces()
@@ -1674,7 +1707,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                             padding: const EdgeInsets.all(5.0),
                             child: Text(
                               'Confirm',
-                              style: textBodyLage.copyWith(fontSize: 18),
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontSize: 18,color: Theme.of(context).colorScheme.onPrimary),
                             ),
                           )),
                     ],
@@ -1727,7 +1760,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
 
       var result = await BarcodeScanner.scan(options: options);
 
-      setState(() async {
+      setState(()  {
         var scanResult  = result;
         print('----------------------');
         print(scanResult.rawContent);
@@ -1741,7 +1774,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
             print(s[1]);
 
 
-            await   ApiSerivces().GetProductid(int.parse(s[1]),_brachid).then((ee) async {
+               ApiSerivces().GetProductid(int.parse(s[1]),_brachid).then((ee) async {
               print(ee.data);
               if(ee.data.length > 0){
                 ApiSerivces()
@@ -1755,7 +1788,11 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
                     ee.data[0]['sellprice'],
                     ee.data[0]
                     ['discount'] ?? 0,
-                    _wh)
+                    _wh,
+                  ee.data[0]['promotionname'],
+                  ee.data[0]['promotionid'],
+                  _brachid
+                )
                     .then((v) {
                   setState(() {
 
@@ -1775,7 +1812,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
 
 
 
-            });
+            }).catchError((e)=>print(e));
 
 
 
@@ -1818,6 +1855,7 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
     TextEditingController _textbid = TextEditingController();
     TextEditingController _textsalech = TextEditingController();
     TextEditingController _textwh = TextEditingController();
+    TextEditingController _textsalename = TextEditingController();
     return showDialog(
       context: context,
       builder: (context) {
@@ -1825,32 +1863,38 @@ class _POSPortraitModeState extends State<POSPortraitMode> {
           backgroundColor: Colors.white,
           content: Container(
             padding: EdgeInsets.only(top: 20,bottom: 20),
-            height: MediaQuery.of(context).size.height*.35,
-            child: EditDateDate(
-              dateshow: _dateshow,
-              controller2: _controller2,
-              onSubmit: (){
-                setState((){
+            height: MediaQuery.of(context).size.height*.75,
+            width: MediaQuery.of(context).size.width,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 20,bottom: 20),
+              child: EditDateDate(
+                dateshow: _dateshow,
+                controller2: _controller2,
+                onSubmit: (){
+                  setState((){
 
-                  _chkmodifile = true;
+                    _chkmodifile = true;
 
-                  print(_controller2.text);
+                    print(_controller2.text);
 
-                  _dateshow = DateTime.parse(_controller2.text);
-                  _salechanel = _textsalech.text;
-                  _brach = _textb.text;
-                  _brachid = int.parse(_textbid.text);
-                  _wh = _textwh.text;
+                    _dateshow = DateTime.parse(_controller2.text);
+                    _salechanel = _textsalech.text;
+                    _brach = _textb.text;
+                    _brachid = int.parse(_textbid.text);
+                    _wh = _textwh.text;
 
-                  Navigator.pop(context);
+                    _empname = _textsalename.text;
 
-                  print(_salechanel);
-                  LoadProudct('', _brachid);
+                    Navigator.pop(context);
 
-                });
+                    print(_salechanel);
+                    LoadProudct('', _brachid);
 
-              },
-              branchid: _textbid, brancname: _textb, salechanel: _textsalech,wh: _textwh,),
+                  });
+
+                },
+                branchid: _textbid, brancname: _textb, salechanel: _textsalech,wh: _textwh,salename: _textsalename,),
+            ),
           ),
 
         );

@@ -1,13 +1,15 @@
 import 'dart:async';
 
 import 'package:country_picker/country_picker.dart';
-import 'package:date_time_picker/date_time_picker.dart';
+
 import 'package:falconpos/theme/textshow.dart';
 import 'package:falconpos/ui/mainpage.dart';
+import 'package:falconpos/ui/mainpos.dart';
 import 'package:falconpos/widget/alert.dart';
 
 import 'package:find_dropdown/find_dropdown.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -81,6 +83,21 @@ class _CustoumersState extends State<Custoumers> {
       print(res.data);
     });
   }
+  String _bday = '';
+  Future displayDatePicker(BuildContext context) async {
+    var date = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(int.parse(DateFormat('yyyy').format(DateTime.now().toLocal()))),
+      lastDate: DateTime(int.parse(DateFormat('yyyy').format(DateTime.now().toLocal()))+1),
+    );
+
+    if (date != null) {
+      setState(() {
+        _bday = DateFormat('yyyy-MM-dd').format(date);
+      });
+    }
+  }
 
   Future<void> LoadCustomerid(id) async {
     ApiSerivces().CoustomerShowSelect(id).then((res) async {
@@ -100,7 +117,7 @@ class _CustoumersState extends State<Custoumers> {
         _address.text = res.data[0]['address'];
         _social.text = res.data[0]['social'];
         _country.text = res.data[0]['country'];
-        _brithday.text = res.data[0]['birthday'].toString();
+        _bday = res.data[0]['birthday'].toString();
 
         _provice.text = res.data[0]['province'];
         _subdist.text = res.data[0]['district'];
@@ -374,7 +391,7 @@ class _CustoumersState extends State<Custoumers> {
                                                         MaterialPageRoute(
                                                             builder: (
                                                                 context) =>
-                                                                MainPage(
+                                                                MainPOS(
                                                                   custid: querySnapshot[i]['id'],
                                                                   custcode: querySnapshot[i]['code'],
                                                                   custname: querySnapshot[i]['name'],
@@ -447,7 +464,7 @@ class _CustoumersState extends State<Custoumers> {
                                               _gender,
                                               _purpose,
                                               _age,
-                                              _brithday.text,
+                                              _bday,
                                               _social.text,
                                               _country.text,
                                               _address.text,
@@ -475,7 +492,7 @@ class _CustoumersState extends State<Custoumers> {
                                               _gender,
                                               _purpose,
                                               _age,
-                                              _brithday.text,
+                                              _bday,
                                               _social.text,
                                               _country.text,
                                               _address.text,
@@ -715,34 +732,15 @@ class _CustoumersState extends State<Custoumers> {
                             Row(
                               children: [
                                 Expanded(
-                                  child: DateTimePicker(
-                                    type: DateTimePickerType.date,
-                                    dateMask: 'yyyy-MM-dd',
-                                    controller: _brithday,
-                                    //initialValue: _initialValue,
-                                    firstDate: DateTime(1800),
-                                    lastDate: DateTime(2100),
-                                    icon: const Icon(Icons.event),
-                                    dateHintText: 'วันที่เกิด',
-
-                                    decoration: inputForm1('วันที่เกิด'),
-
-                                    locale: const Locale('th', 'TH'),
-
-                                    onChanged: (val) =>
-                                        setState(() {
-                                          _britdaytext = val;
-
-                                          setState(() {});
-                                        }),
-                                    validator: (val) {
-                                      setState(() => _britdaytext = val ?? '');
-                                      return null;
-                                    },
-                                    onSaved: (val) =>
-                                        setState(() =>
-                                        _britdaytext = val ?? ''),
-                                  ),
+                                  child: InkWell(
+                                    onTap: ()=>displayDatePicker,
+                                    child: Row(
+                                      children: [
+                                        Icon(LineIcons.birthdayCake),
+                                        Text('${_bday}')
+                                      ],
+                                    ) ,
+                                  )
                                 ),
                                 const SizedBox(
                                   width: 10,

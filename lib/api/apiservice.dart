@@ -524,6 +524,23 @@ class ApiSerivces {
       print(e);
     }
   }
+  Future CheckPromotion(proid, branchid ,date) async {
+    try {
+      Response res = await _dio.post(url + '/apipromotion',
+          data: {'proid': proid, 'branchid': branchid , 'date':date},
+          options: Options(contentType: Headers.formUrlEncodedContentType));
+
+      if (res.statusCode == 200) {
+        print(res);
+
+        return res;
+      } else {
+        return false;
+      }
+    } on DioError catch (e) {
+      print(e);
+    }
+  }
   Future GetSalechanel() async {
     try {
       Response res = await _dio.post(url + '/selectsalechanel',
@@ -543,6 +560,21 @@ class ApiSerivces {
   Future GetBranch() async {
     try {
       Response res = await _dio.post(url + '/selectbranch',
+          options: Options(contentType: Headers.formUrlEncodedContentType));
+
+      if (res.statusCode == 200) {
+        // print(res);
+        return res;
+      } else {
+        return false;
+      }
+    } on DioError catch (e) {
+      print(e);
+    }
+  }
+  Future Getsalename() async {
+    try {
+      Response res = await _dio.post(url + '/selecemp',
           options: Options(contentType: Headers.formUrlEncodedContentType));
 
       if (res.statusCode == 200) {
@@ -791,7 +823,7 @@ class ApiSerivces {
   }
 
   Future AddItem(
-      docno, proid, sku, name, qty, price, totprice, dicount, wh) async {
+      docno, proid, sku, name, qty, price, totprice, dicount, wh,promotionname,promotionid,branchid) async {
     try {
       Response res = await _dio.post(url + '/inserttmppos',
           data: {
@@ -803,6 +835,9 @@ class ApiSerivces {
             "price": price,
             "totprice": price,
             "dicount": dicount,
+            "promotionid": promotionid,
+            "promotionname":promotionname,
+            'branchid':branchid,
             "wh": wh
           },
           options: Options(contentType: Headers.formUrlEncodedContentType));
@@ -821,6 +856,21 @@ class ApiSerivces {
     try {
       Response res = await _dio.post(url + '/updatepos',
           data: {"id": id, "qty": qty, "totprice": totprice},
+          options: Options(contentType: Headers.formUrlEncodedContentType));
+
+      if (res.statusCode == 200) {
+        return res;
+      } else {
+        return false;
+      }
+    } on DioError catch (e) {
+      print(e);
+    }
+  }
+  Future UpDateItemDiscount(id, discount) async {
+    try {
+      Response res = await _dio.post(url + '/updatepositemdiscount',
+          data: {"id": id, "discount": discount},
           options: Options(contentType: Headers.formUrlEncodedContentType));
 
       if (res.statusCode == 200) {
@@ -1059,6 +1109,21 @@ class ApiSerivces {
       print(e);
     }
   }
+  Future PosAddTran(id, text) async {
+    try {
+      Response res = await _dio.post(url + '/apiposaddtran',
+          data: {'id': id, 'text': text},
+          options: Options(contentType: Headers.formUrlEncodedContentType));
+
+      if (res.statusCode == 200) {
+        return res;
+      } else {
+        return false;
+      }
+    } on DioError catch (e) {
+      print(e);
+    }
+  }
   Future Updatestockoutapi(gencode, empname) async {
     try {
       Response res = await _dio.post(url + '/updatestockoutapi',
@@ -1074,10 +1139,10 @@ class ApiSerivces {
       print(e);
     }
   }
-  Future CanelOrer(gencode) async {
+  Future CanelOrer(gencode,reson) async {
     try {
       Response res = await _dio.post(url + '/poscancelorder',
-          data: {'gencode': gencode},
+          data: {'gencode': gencode,'text':reson},
           options: Options(contentType: Headers.formUrlEncodedContentType));
 
       if (res.statusCode == 200) {
@@ -1241,6 +1306,50 @@ class ApiSerivces {
           data: {"gencode":gencode},
           options: Options(contentType: Headers.formUrlEncodedContentType));
 
+      if (res.statusCode == 200) {
+        return res;
+      } else {
+        return false;
+      }
+    } on DioError catch (e) {
+      print(e);
+    }
+  }
+  Future Register(name,tel,email,bus) async {
+    try {
+      Response res = await _dio.post(url + '/registeruser',
+          data: {"email":email,'name':name,'tel':tel},
+          options: Options(contentType: Headers.formUrlEncodedContentType));
+
+      if (res.statusCode == 200) {
+        return res;
+      } else {
+        return false;
+      }
+    } on DioError catch (e) {
+      print(e);
+    }
+  }
+  Future Userid(id) async {
+    try {
+      Response res = await _dio.post(url + '/selectuserid',
+          data: {"id":id},
+          options: Options(contentType: Headers.formUrlEncodedContentType));
+
+      if (res.statusCode == 200) {
+        return res;
+      } else {
+        return false;
+      }
+    } on DioError catch (e) {
+      print(e);
+    }
+  }
+  Future UserUpdate(id,name,tel,status) async {
+    try {
+      Response res = await _dio.post(url + '/appupdateuser',
+          data: {"id":id,"name":name,"tel":tel,"status":status},
+          options: Options(contentType: Headers.formUrlEncodedContentType));
       if (res.statusCode == 200) {
         return res;
       } else {

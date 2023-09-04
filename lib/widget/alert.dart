@@ -110,3 +110,52 @@ Future AlertShow(BuildContext context ,String  text ){
       )
   );
 }
+Future AlertShowSucces(BuildContext context ,String  text ){
+
+  return showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+
+          content: SizedBox(
+            height: MediaQuery.of(context).size.height*.3,
+            width: MediaQuery.of(context).size.width*.3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(child: Container(
+                  alignment: Alignment.center,
+                  child: Column(
+                    children: [
+                      Icon(LineIcons.checkCircle,size: 124,color: Colors.green,),
+                      Text(text,style: textBodyMedium.copyWith(fontSize: 16,color: Colors.black),)
+                    ],
+                  ),
+                )),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent
+                        ),
+                        onPressed: (){
+                          Navigator.of(context).pop();
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Text('OK',style: textBodyLage.copyWith(fontSize: 18)),
+                        )),
+
+
+                  ],
+                ),
+              ],
+            ),
+          )
+
+      )
+  );
+}

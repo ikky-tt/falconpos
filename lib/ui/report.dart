@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:date_time_picker/date_time_picker.dart';
 import 'package:falconpos/api/apiservice.dart';
 import 'package:falconpos/theme/textshow.dart';
 import 'package:flutter/foundation.dart';

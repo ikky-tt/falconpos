@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:country_picker/country_picker.dart';
-import 'package:date_time_picker/date_time_picker.dart';
+
 import 'package:find_dropdown/find_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
@@ -445,46 +445,7 @@ class _AddNewCustomerState extends State<AddNewCustomer> {
                 const SizedBox(
                   height: 10,
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: DateTimePicker(
-                        type: DateTimePickerType.date,
-                        dateMask: 'yyyy-MM-dd',
-                        controller: _brithday,
-                        //initialValue: _initialValue,
-                        firstDate: DateTime(1800),
-                        lastDate: DateTime(2100),
-                        icon: const Icon(Icons.event),
-                        dateHintText: 'วันที่เกิด',
 
-                        decoration: inputForm1('วันที่เกิด'),
-
-                        locale: const Locale('th', 'TH'),
-
-                        onChanged: (val) => setState(() {
-                          _britdaytext = val;
-
-                          setState(() {});
-                        }),
-                        validator: (val) {
-                          setState(() => _britdaytext = val ?? '');
-                          return null;
-                        },
-                        onSaved: (val) =>
-                            setState(() => _britdaytext = val ?? ''),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                        child: TextFormField(
-                          decoration: inputForm1('Social Meadia'),
-                          controller: _social,
-                        ))
-                  ],
-                ),
                 const SizedBox(
                   height: 10,
                 ),

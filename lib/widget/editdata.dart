@@ -1,6 +1,4 @@
-import 'package:date_time_picker/date_time_picker.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-
 import 'package:find_dropdown/find_dropdown.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,8 +17,8 @@ class EditDateDate extends StatefulWidget {
   late TextEditingController brancname;
   late  TextEditingController salechanel;
   late  TextEditingController wh;
-
-  EditDateDate({Key? key, required this.dateshow, required this.controller2, required this.onSubmit, required this.branchid, required this.brancname,  required this.salechanel,required this.wh}) : super(key: key);
+  late  TextEditingController salename;
+  EditDateDate({Key? key, required this.dateshow, required this.controller2, required this.onSubmit, required this.branchid, required this.brancname,  required this.salechanel,required this.wh,required this.salename}) : super(key: key);
 
   @override
   State<EditDateDate> createState() => _EditDateDateState();
@@ -31,6 +29,7 @@ class _EditDateDateState extends State<EditDateDate> {
 
   List<SalechanelModel> _salechanel = [];
   List<SelectBranchModel> _selectbranch = [];
+  List<SalechanelModel> _selcetemp = [];
 
   Future<List<SalechanelModel>> getData() async {
     var response = await ApiSerivces().GetSalechanel();
@@ -55,6 +54,18 @@ class _EditDateDateState extends State<EditDateDate> {
 
     return [];
   }
+
+  Future<List<SalenameModel>> getsalename() async {
+    var response = await ApiSerivces().Getsalename();
+
+    final data = response.data;
+    // print(data);
+    if (data != null) {
+      return SalenameModel.fromJsonList(data);
+    }
+
+    return [];
+  }
   @override
   void initState() {
     // TODO: implement initState
@@ -63,31 +74,35 @@ class _EditDateDateState extends State<EditDateDate> {
 widget.controller2.text = DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now());
 
   }
+  Future displayDatePicker(BuildContext context) async {
+    var date = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(int.parse(DateFormat('yyyy').format(DateTime.now().toLocal()))),
+      lastDate: DateTime(int.parse(DateFormat('yyyy').format(DateTime.now().toLocal()))+1),
+    );
 
+    if (date != null) {
+      setState(() {
+        widget.controller2.text = DateFormat('yyyy-MM-dd').format(date);
+      });
+    }
+  }
   String valueChanged2 ='';
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        DateTimePicker(
-          decoration: inputForm1('DateTime'),
-          type: DateTimePickerType.dateTime,
-          dateMask: 'dd/MM/yy HH:mm',
-          controller: widget.controller2,
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2100),
-          //icon: Icon(Icons.event),
-          dateLabelText: 'Date Time',
-          use24HourFormat: true,
+        Row(
+          children: [
+            Expanded(child:    TextFormField(
+                decoration: inputForm1('วันที่'),
+                controller: widget.controller2
 
-          onChanged: (val) => setState(() => valueChanged2 = val),
-          onSaved: (val) => setState(() {
-
-            valueChanged2 =  DateFormat('dd/MM/yy').format(DateTime.parse(val!));
-
-
-          } ),
+            ),),
+            IconButton(onPressed: ()=>displayDatePicker(context), icon: Icon(LineIcons.calendar))
+          ],
         ),
         DropdownSearch<SalechanelModel>(
           asyncItems: (String? filter) => getData(),
@@ -133,7 +148,7 @@ widget.controller2.text = DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now());
                 borderRadius: BorderRadius.all(Radius.circular(15.0)),
                 borderSide: BorderSide(width: 1, color: HexColor('3ea3d4'),),
               ),
-              labelText: 'Sale Chanal',
+              labelText: 'Sale Chanel',
               filled: true,
               fillColor: Theme.of(context).inputDecorationTheme.fillColor,
             ),
@@ -192,7 +207,59 @@ widget.controller2.text = DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now());
             ),
           ),
         ),
+        DropdownSearch<SalenameModel>(
+          asyncItems: (String? filter) => getsalename(),
+          popupProps: PopupPropsMultiSelection.modalBottomSheet(
+            showSelectedItems: true,
+            showSearchBox:false,
+            itemBuilder: (BuildContext context, SalenameModel item, bool isSelected) {
+              return Container(
+                margin: EdgeInsets.symmetric(horizontal: 8),
+                decoration: !isSelected
+                    ? null
+                    : BoxDecoration(
+                  border: Border.all(color: Theme.of(context).primaryColor),
+                  borderRadius: BorderRadius.circular(5),
+                  color: Colors.white,
+                ),
+                child: ListTile(
+                  selected: isSelected,
+                  title: Text(item.name,style: textBodyLage.copyWith(color: Colors.black),),
+                ),
+              );
+            },
 
+          ),
+          compareFn: (item, sItem) => item.id == sItem.id,
+          onChanged: (e){
+
+            setState(() {
+
+              widget.salename.text = e!.name;
+
+            });
+          },
+          dropdownDecoratorProps: DropDownDecoratorProps(
+            baseStyle: textBodyLage.copyWith(fontSize: 14,color: Colors.black),
+            dropdownSearchDecoration: InputDecoration(
+              enabledBorder:  OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15.0),
+                borderSide:  BorderSide(color: HexColor('3ea3d4'), width: 1.0),
+              ),
+              labelStyle: textBody.copyWith(fontSize: 14,color: HexColor('3ea3d4')),
+              border:
+              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0)),
+              contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+              focusedBorder:  OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                borderSide: BorderSide(width: 1, color: HexColor('3ea3d4'),),
+              ),
+              labelText: 'Sale Name',
+              filled: true,
+              fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+            ),
+          ),
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -252,7 +319,32 @@ class  SalechanelModel {
 
 
 }
+class  SalenameModel {
+  late final int id;
+  late final String name;
 
+  SalenameModel({required this.id, required this.name, });
+
+  factory SalenameModel.fromJson(Map<String, dynamic> json) {
+
+    return SalenameModel(
+      id: json["emp_id"],
+      name: json["emp_name"],
+    );
+  }
+
+  static List<SalenameModel> fromJsonList(List list) {
+    return list.map((item) => SalenameModel.fromJson(item)).toList();
+  }
+
+  String toString() => name;
+
+  @override
+  operator ==(o) => o is SalechanelModel && o.id == id;
+
+
+
+}
 class  SelectBranchModel {
    final int id;
    final String name;

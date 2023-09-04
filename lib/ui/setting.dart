@@ -1,4 +1,7 @@
-import 'package:falconpos/ui/settingslip.dart';
+import 'package:falconpos/ui/printerbluetooth.dart';
+
+import 'settingslip.dart';
+import 'usersetting.dart';
 import 'package:flutter/material.dart';
 import 'package:line_icons/line_icons.dart';
 
@@ -20,6 +23,8 @@ class _SettingState extends State<Setting> {
     // TODO: implement initState
     super.initState();
     _memu.add(ListMenuShow(name: 'Setting Slip', icon: Icon(LineIcons.receipt,size: 32,color: Colors.black,), link: SettingSlip()));
+    _memu.add(ListMenuShow(name: 'Setting User', icon: Icon(LineIcons.userCog,size: 32,color: Colors.black,), link: Usersetting()));
+
   }
   
   @override
@@ -103,7 +108,7 @@ class _SettingState extends State<Setting> {
                                     ),
                                     Text('${_memu[i].name}',
                                       style: textBodyLage.copyWith(
-                                          fontSize: 18,color: Colors.black),
+                                          fontSize: 14,color: Colors.black),
                                     ),
                                   ],
                                 )
@@ -174,7 +179,7 @@ class _SettingState extends State<Setting> {
                                     ),
                                     Text('${_memu[i].name}',
                                       style: textBodyLage.copyWith(
-                                          fontSize: 24,color: Colors.black),
+                                          fontSize: 18,color: Colors.black),
                                     ),
                                   ],
                                 )

@@ -5,6 +5,7 @@ import 'package:barcode_scan2/model/android_options.dart';
 import 'package:barcode_scan2/model/scan_options.dart';
 import 'package:barcode_scan2/platform_wrapper.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:falconpos/widget/editbranch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:line_icons/line_icons.dart';
@@ -13,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../api/apiservice.dart';
 import '../api/constant.dart';
 import '../theme/textshow.dart';
+
 import 'login.dart';
 
 class received extends StatefulWidget {
@@ -27,6 +29,7 @@ class _receivedState extends State<received> {
   String _wh = '';
   String _brach = '';
   int _brachid = 0;
+  int _lv = 0;
   GetLogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -34,6 +37,7 @@ class _receivedState extends State<received> {
       _brach = prefs.getString('branch')!;
       _brachid = prefs.getInt('branchid')!;
       _wh = prefs.getString('wh')!;
+      _lv = prefs.getInt('lv')!;
       print(_brachid);
       LoadProduct(_brachid);
       if (prefs.getInt('login') != 1) {
@@ -82,7 +86,19 @@ class _receivedState extends State<received> {
               color: Colors.white,
             ),
           ),
-          title: Text('Received',style: textBodyLage,),
+          title: Text('Received ${_brach}',style: textBodyLage,),
+          actions: [
+            _lv==1?Container(
+              padding: EdgeInsets.all(2),
+              alignment: Alignment.center,
+              child: IconButton(
+                  alignment: Alignment.center,
+                  onPressed: (){
+                    EditDate();
+                  },
+                  icon: Icon(Icons.edit,color: Colors.white,size: 23,)),
+            ):Row(),
+          ],
           centerTitle: true,
         ),
         body: OrientationBuilder(
@@ -118,12 +134,23 @@ Widget P() {
                     Expanded(child: TextField(
                       decoration: inputForm1('serialnumber'),
                     )),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                          onPressed: (){},
-                          child: Icon(LineIcons.search,size: 30,color: Colors.white,)),
+                    SizedBox(
+                      width: 10,
                     ),
+                    Padding(
+                      padding: const EdgeInsets.all(3.0),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+
+                        ),
+                          onPressed: (){},
+                          child: Icon(LineIcons.search,size: 23,color: Colors.white,)),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+
                   ],
                 ),
               ),
@@ -336,5 +363,43 @@ Widget P() {
 
       });
     }
+  }
+  Future EditDate(){
+
+    TextEditingController _textb  = TextEditingController();
+    TextEditingController _textbid = TextEditingController();
+    TextEditingController _textsalech = TextEditingController();
+    TextEditingController _textwh = TextEditingController();
+    TextEditingController _controller2 = TextEditingController();
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          content: Container(
+            padding: EdgeInsets.only(top: 20,bottom: 20),
+            height: MediaQuery.of(context).size.height*.35,
+            child: EditBranch(
+
+              controller2: _controller2,
+              onSubmit: (){
+                setState((){
+                  print(_controller2.text);
+                  _brach = _textb.text;
+                  _brachid = int.parse(_textbid.text);
+                  _wh = _textwh.text;
+                  LoadProduct(_brachid);
+                  Navigator.pop(context);
+
+                });
+
+              },
+              branchid: _textbid, brancname: _textb,wh: _textwh,
+            ),
+          ),
+
+        );
+      },
+    );
   }
 }
